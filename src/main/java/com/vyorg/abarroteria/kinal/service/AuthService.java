@@ -28,16 +28,19 @@ public class AuthService {
         }
         
         LoginDTOResponse response = authRepository.findUserByEmail(loginDTORequest);
-            
-        if(response.getContrasenaHash() == null){
-            throw new RuntimeException("");
-        }else{
-            
-            if(BCrypt.checkpw(loginDTORequest.getPassword(), response.getContrasenaHash())){
-                return response;
-//new LoginDTOResponse(response.getNombre(), response.getApellido(),response.getIdRol()){      
-     }            
+
+        if(response == null){
+            throw new RuntimeException("No existe un usuario con ese correo");
         }
-            return null;
-}
+
+        if(response.getContrasenaHash() == null){
+            throw new RuntimeException("El usuario no tiene contraseña registrada");
+        }
+
+        if(BCrypt.checkpw(loginDTORequest.getPassword(), response.getContrasenaHash())){
+            return response;
+        }
+
+        throw new RuntimeException("Contraseña incorrecta");
     }
+}

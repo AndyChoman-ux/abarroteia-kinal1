@@ -28,9 +28,9 @@ public class AuthRepository {
             );
         }
     }catch(SQLException e){
-        System.out.println("Error al buscarel usuario");
-                
-        }
+        e.printStackTrace();
+        throw new RuntimeException("Error de conexion con la base de datos: " + e.getMessage());
+    }
     return null;
 }
 }

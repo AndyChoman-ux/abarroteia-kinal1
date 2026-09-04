@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -24,22 +25,29 @@ public class LoginController implements Initializable {
     private TextField txtFieldEmail;
     @FXML
     private PasswordField txtFieldPassword;
-    
+   
    // constructor
    public LoginController(AuthService authService, SceneManager sceneManager){
     this.authService = authService;
     this.sceneManager = sceneManager;
    }
+  
     @Override
     public void initialize(URL url, ResourceBundle rb) {
        
     }  
-    public void handleLogin(){
+    
+    public void handleLogin() throws Exception{
     if(txtFieldEmail.getText().isEmpty() || txtFieldPassword.getText().isEmpty() ){
-        throw new RuntimeException("");
+        sceneManager.showAlertInfo("Hay campos sin llenar", "No puedes dejar espacios en blanco","Intente de nuevo", Alert.AlertType.INFORMATION);
     }else{
-       LoginDTOResponse response=  authService.login(new LoginDTORequest(txtFieldEmail.getText(), txtFieldPassword.getText()));
-     System.out.println("nombre del usuario que inició sesión: " + response.getNombre() + " " + response.getIdRol());
+        try{
+            LoginDTOResponse response = authService.login(new LoginDTORequest(txtFieldEmail.getText(),txtFieldPassword.getText()));
+            sceneManager.showAlertInfo("Bienvenido: " + response.getNombre(), "Es bueno verte:", "Inicio de sesion correcto", Alert.AlertType.INFORMATION);
+             sceneManager.showDashboardView();
+        }catch(RuntimeException e){
+    sceneManager.showAlertInfo("Error al iniciar sesion", "Verifique los campos", e.getMessage(), Alert.AlertType.WARNING);
+}
     }
 }
     
