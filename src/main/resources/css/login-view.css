@@ -1,7 +1,98 @@
 /*
- * Empty Stylesheet file.
+ * Estilos para login-view.fxml — pantalla "Iniciar Sesion"
  */
 
-.mainFxmlClass {
+.root-pane {
+    -fx-font-family: "Segoe UI";
+}
 
+.background-pane {
+    -fx-background-color: #eef1f4;
+}
+
+.background-image {
+    -fx-background-image: url("../img/login-background.png");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+}
+
+.background-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.55);
+}
+
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 25, 0, 0, 8);
+}
+
+.login-title {
+    -fx-text-fill: #16324F;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 0 4 0;
+}
+
+.input-wrapper {
+    -fx-background-color: #F1F3F5;
+    -fx-background-radius: 8;
+    -fx-padding: 8 14 8 14;
+    -fx-spacing: 8;
+}
+
+.input-icon {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 14px;
+}
+
+.input-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+    -fx-font-size: 13px;
+    -fx-padding: 4 0 4 0;
+}
+
+.input-field:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.forgot-link {
+    -fx-text-fill: #2856A3;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.btn-ingresar {
+    -fx-background-color: #F5821F;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-pref-height: 44px;
+    -fx-cursor: hand;
+}
+
+.btn-ingresar:hover {
+    -fx-background-color: #E0741A;
+}
+
+.register-text {
+    -fx-text-fill: #4B5563;
+    -fx-font-size: 12px;
+}
+
+.register-link {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #2E9E4F;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.register-link:hover {
+    -fx-underline: true;
 }
