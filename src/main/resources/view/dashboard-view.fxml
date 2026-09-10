@@ -8,146 +8,139 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="535.0" prefWidth="738.0" style="-fx-background-color: #F0F4F8;" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
-   <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label prefHeight="37.0" prefWidth="183.0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1B5E20;;" stylesheets="@../css/dashboard-view.css" text="Abarroteria kinal">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <ImageView fitHeight="27.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
-            <TextField prefHeight="25.0" prefWidth="412.0" style="-fx-background-color: #F8FAFC; -fx-background-radius: 8; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-padding: 7 12;;" stylesheets="@../css/dashboard-view.css" text="Buscar producto" />
-         </children>
-      </HBox>
-   </top>
-   <left>
-      <VBox prefHeight="420.0" prefWidth="33.0" BorderPane.alignment="CENTER" />
-   </left>
-   <right>
-      <VBox prefHeight="395.0" prefWidth="321.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 4); -fx-padding: 15;;" stylesheets="@../css/dashboard-view.css" BorderPane.alignment="CENTER">
-         <children>
-            <TextField prefHeight="23.0" prefWidth="291.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2E7D32;;" stylesheets="@../css/dashboard-view.css" text="Ticket de venta">
-               <font>
-                  <Font size="18.0" />
-               </font>
-               <VBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </VBox.margin>
-            </TextField>
-            <HBox alignment="CENTER_LEFT" prefHeight="72.0" prefWidth="321.0">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0" prefWidth="760.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardController">   <children>
+      <ImageView fitHeight="560.0" fitWidth="760.0" opacity="0.18" preserveRatio="false">
+         <image>
+            <Image url="@../img/login-background.png" />
+         </image>
+      </ImageView>
+      <BorderPane styleClass="root-transparente">
+         <top>
+            <VBox alignment="CENTER" spacing="12.0" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="14.0" left="20.0" right="20.0" top="18.0" />
+               </padding>
                <children>
-                  <VBox prefHeight="53.0" prefWidth="189.0">
+                                   <StackPane alignment="CENTER">
                      <children>
-                        <Label prefHeight="24.0" prefWidth="158.0" style="-fx-text-fill: #64748B; -fx-font-size: 13px;" stylesheets="@../css/dashboard-view.css" text="        Lista de precio" />
-                        <ComboBox prefHeight="25.0" prefWidth="150.0" promptText="General" style="-fx-background-color: #F5F7FA;-fx-background-radius: 8;-fx-border-color: #E0E0E0;-fx-border-radius: 8;-fx-padding: 8 12;;">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <VBox.margin>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </VBox.margin>
-                        </ComboBox>
+                        <Label styleClass="app-title" text="Abarroteria Kinal" />
+                        <ImageView fitHeight="94.0" fitWidth="94.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER_LEFT">
+                           <image>
+                              <Image url="@../img/login-logo.png" />
+                           </image>
+                        </ImageView>
                      </children>
-                  </VBox>
-                  <VBox prefHeight="90.0" prefWidth="189.0">
+                  </StackPane>
+                  <HBox alignment="CENTER_LEFT" maxWidth="440.0" styleClass="search-box">
                      <children>
-                        <Label prefHeight="24.0" prefWidth="141.0" style="-fx-text-fill: #64748B; -fx-font-size: 13px;" stylesheets="@../css/dashboard-view.css" text="         Numeracón" />
-                        <ComboBox prefHeight="43.0" prefWidth="157.0" promptText="Ticket principal" style="-fx-background-color: #F5F7FA;-fx-background-radius: 8;-fx-border-color: #E0E0E0;-fx-border-radius: 8;-fx-padding: 8 12;;" stylesheets="@../css/dashboard-view.css">
-                           <VBox.margin>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </VBox.margin>
-                        </ComboBox>
-                     </children>
-                  </VBox>
-               </children>
-            </HBox>
-            <HBox prefHeight="50.0" prefWidth="321.0">
-               <children>
-                  <Label prefHeight="25.0" prefWidth="85.0" style="-fx-text-fill: #64748B; -fx-font-size: 13px;" stylesheets="@../css/dashboard-view.css" text="Cliente" />
-                  <TextField prefHeight="16.0" prefWidth="264.0" style="-fx-background-color: #F8FAFC; -fx-background-radius: 8; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-padding: 7 12; -fx-text-fill: #334155;;" stylesheets="@../css/dashboard-view.css" text="Publico en general">
-                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </HBox.margin>
-                  </TextField>
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </HBox>
-            <ListView prefHeight="234.0" prefWidth="321.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #E2E8F0; -fx-border-radius: 8;;" stylesheets="@../css/dashboard-view.css">
-               <VBox.margin>
-                  <Insets right="5.0" />
-               </VBox.margin>
-            </ListView>
-            <VBox prefHeight="117.0" prefWidth="321.0" spacing="0.8">
-               <children>
-                  <HBox prefHeight="38.0" prefWidth="321.0">
-                     <children>
-                        <Label prefHeight="28.0" prefWidth="169.0" style="-fx-text-fill: #64748B; -fx-font-size: 13px;;" stylesheets="@../css/dashboard-view.css" text="Vender">
-                           <HBox.margin>
-                              <Insets left="10.0" />
-                           </HBox.margin>
-                        </Label>
-                        <Label alignment="BASELINE_RIGHT" prefHeight="31.0" prefWidth="138.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2E7D32;;" stylesheets="@../css/dashboard-view.css" text="0.00$" textAlignment="RIGHT" />
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="94.0" prefWidth="321.0">
-                     <children>
-                        <VBox alignment="CENTER_LEFT" prefHeight="79.0" prefWidth="238.0" spacing="10.0">
-                           <children>
-                              <Label prefHeight="30.0" prefWidth="116.0" style="-fx-text-fill: #64748B; -fx-font-size: 13px;;" stylesheets="@../css/dashboard-view.css" text="0 productos" />
-                              <Button mnemonicParsing="false" style="-fx-background-color: #43A047; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;;" text="Agregar al carrito" />
-                           </children>
-                           <HBox.margin>
-                              <Insets left="10.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox alignment="CENTER_RIGHT" prefHeight="48.0" prefWidth="234.0" spacing="10.0">
-                           <children>
-                              <Button alignment="TOP_LEFT" mnemonicParsing="false" prefHeight="29.0" prefWidth="109.0" style="-fx-background-color: #E2E#ECEFF1;-fx-text-fill: #546E7A;-fx-background-radius: 8;-fx-cursor: hand;8F0;" text="Cancelar" />
-                              <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="108.0" style="-fx-background-color: #F57C00; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;;" text="Comprar" />
-                           </children>
-                           <HBox.margin>
-                              <Insets right="5.0" />
-                           </HBox.margin>
-                        </VBox>
+                        <Label styleClass="search-icon" text="🔍" />
+                        <TextField fx:id="txtBuscarProducto" promptText="Buscar producto" styleClass="search-field" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
                </children>
             </VBox>
-         </children>
-         <BorderPane.margin>
-            <Insets left="10.0" />
-         </BorderPane.margin>
-      </VBox>
-   </right>
-   <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-         <children>
-            <TableView prefHeight="421.0" prefWidth="347.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 4); -fx-padding: 10;;">
-              <columns>
-                <TableColumn prefWidth="68.0" text="ID" />
-                <TableColumn prefWidth="75.0" text="Nombre" />
-                  <TableColumn prefWidth="85.0" text="Precio" />
-                  <TableColumn prefWidth="116.0" text="Stock" />
-              </columns>
-            </TableView>
-            <HBox alignment="CENTER_RIGHT" prefHeight="96.0" prefWidth="348.0" spacing="10.0">
+         </top>
+         <center>
+            <VBox spacing="14.0" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="16.0" left="20.0" right="10.0" />
+               </padding>
                <children>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #ECEFF1;-fx-text-fill: #546E7A;-fx-background-radius: 8;-fx-cursor: hand;;" text="Cerrar sesión" />
-                  <Button mnemonicParsing="false" style="-fx-background-color: #ECEFF1;-fx-text-fill: #546E7A;-fx-background-radius: 8;-fx-cursor: hand;;" text="Eliminar" />
+                  <TableView fx:id="tableProductos" styleClass="card" VBox.vgrow="ALWAYS">
+                     <columns>
+                        <TableColumn fx:id="tableColumnIdProducto" prefWidth="90.0" text="ID" />
+                        <TableColumn fx:id="tableColumnNombre" prefWidth="170.0" text="Nombre" />
+                        <TableColumn fx:id="tableColumnPrecio" prefWidth="100.0" text="Precio" />
+                        <TableColumn fx:id="tableColumnStock" prefWidth="100.0" text="Stock" />
+                     </columns>
+                     <placeholder>
+                        <Label styleClass="placeholder-label" text="Tabla sin contenido" />
+                     </placeholder>
+                  </TableView>
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                     <children>
+                        <Button fx:id="btnCerrarSesion" onAction="#handleCerrarSesion" styleClass="btn-secundario" text="Cerrar sesión" />
+                        <Button fx:id="btnEliminarProducto" onAction="#handleEliminarProducto" styleClass="btn-secundario" text="Eliminar" />
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
-         </children>
-      </VBox>
-   </center>
-</BorderPane>
+            </VBox>
+         </center>
+         <right>
+            <VBox prefWidth="300.0" spacing="8.0" styleClass="ticket-card" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+               </padding>
+               <children>
+                  <Label styleClass="ticket-title" text="Ticket de venta" />
+                  <HBox spacing="10.0">
+                     <children>
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="label-gris" text="Lista de precio" />
+                              <ComboBox fx:id="cbListaPrecio" maxWidth="1.7976931348623157E308" styleClass="campo" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="label-gris" text="Numeración" />
+                              <ComboBox fx:id="cbNumeracion" maxWidth="1.7976931348623157E308" styleClass="campo" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <VBox spacing="4.0">
+                     <children>
+                        <Label styleClass="label-gris" text="Cliente" />
+                        <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="campo">
+                           <children>
+                              <Label text="👤" />
+                              <TextField fx:id="txtCliente" styleClass="cliente-field" text="Publico en general" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <ListView fx:id="listViewCarrito" styleClass="cart-list" VBox.vgrow="ALWAYS" />
+                  <VBox spacing="6.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label styleClass="label-vender" text="  Total" textOverrun="WORD_ELLIPSIS" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="Baskerville Old Face" size="52.0" />
+                                 </font></Label>
+                              <Label fx:id="lblTotal" styleClass="label-total" text="                                 Q0.00" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="10.0">
+                           <children>
+                              <VBox alignment="CENTER_LEFT" spacing="8.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label fx:id="lblCantidadProductos" styleClass="label-gris" text="0 productos" />
+                                    <Button fx:id="btnAgregarCarrito" maxWidth="1.7976931348623157E308" onAction="#handleAgregarCarrito" styleClass="btn-verde" text="Agregar al carrito" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER_RIGHT" spacing="8.0">
+                                 <children>
+                                    <Button fx:id="btnCancelar" onAction="#handleCancelarCarrito" styleClass="btn-secundario" text="Cancelar" />
+                                    <Button fx:id="btnComprar" onAction="#handleComprar" styleClass="btn-naranja" text="Comprar" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </right>
+      </BorderPane>
+   </children>
+</StackPane>
