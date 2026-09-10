@@ -50,5 +50,14 @@ public class LoginController implements Initializable {
 }
     }
 }
+    @FXML
+private void handleIrRegistro() {
+    try {
+        sceneManager.showRegistroView();
+    } catch (Exception e) {
+        sceneManager.showAlertInfo("Error", "No se pudo abrir la ventana de registro", e.getMessage(), Alert.AlertType.ERROR);
+    }
+}
+    
     
 }
