@@ -24,7 +24,14 @@ import main.java.com.vyorg.abarroteria.kinal.model.CarritoItem;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 import main.java.com.vyorg.abarroteria.kinal.service.DashboardService;
 import main.java.com.vyorg.abarroteria.kinal.util.SceneManager;
-
+import java.util.ArrayList;
+import java.util.List;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import main.java.com.vyorg.abarroteria.kinal.util.FacturaPdfGenerator;
+import javafx.scene.control.DialogPane;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 public class DashboardController implements Initializable {
 
@@ -190,11 +197,13 @@ public class DashboardController implements Initializable {
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog("1");
-        dialog.setTitle("Cantidad");
-        dialog.setHeaderText("Agregar " + seleccionado.getNombreProducto() + " al carrito");
-        dialog.setContentText("Cantidad:");
-        Optional<String> resultado = dialog.showAndWait();
+       TextInputDialog dialog = new TextInputDialog("1");
+dialog.setTitle("Cantidad");
+dialog.setHeaderText("Agregar " + seleccionado.getNombreProducto() + " al carrito");
+dialog.setContentText("Cantidad:");
+sceneManager.estilizarDialogo(dialog);
+
+Optional<String> resultado = dialog.showAndWait();
 
         if (resultado.isEmpty()) {
             return;
@@ -261,44 +270,66 @@ public class DashboardController implements Initializable {
         actualizarResumenCarrito();
     }
 
-    @FXML
-    private void handleComprar() {
-        if (carrito.isEmpty()) {
-            sceneManager.showAlertInfo("Carrito vacio", "No hay productos",
-                    "Agregue al menos un producto al carrito antes de comprar", Alert.AlertType.WARNING);
-            return;
+   
+   @FXML
+private void handleComprar() {
+    if (carrito.isEmpty()) {
+        sceneManager.showAlertInfo("Carrito vacio", "No hay productos",
+                "Agregue al menos un producto al carrito antes de comprar", Alert.AlertType.WARNING);
+        return;
+    }
+
+    BigDecimal total = calcularTotal();
+    String cliente = txtCliente.getText() == null || txtCliente.getText().isBlank()
+            ? "Publico en general" : txtCliente.getText();
+
+    boolean confirmado = sceneManager.showConfirmation(
+            "Confirmar venta",
+            "Total a cobrar: Q" + total.setScale(2, RoundingMode.HALF_UP),
+            "Cliente: " + cliente + "\n¿Desea confirmar la venta?");
+
+    if (!confirmado) {
+        return;
+    }
+
+    try {
+        for (CarritoItem item : carrito) {
+            dashboardService.descontarStock(item.getProducto().getIdProducto(), item.getCantidad());
         }
+    } catch (RuntimeException e) {
+        sceneManager.showAlertInfo("Error en la venta", "No se pudo completar la compra",
+                e.getMessage(), Alert.AlertType.ERROR);
+        return;
+    }
 
-        BigDecimal total = calcularTotal();
-        String cliente = txtCliente.getText() == null || txtCliente.getText().isBlank()
-                ? "Publico en general" : txtCliente.getText();
+    List<CarritoItem> carritoVenta = new ArrayList<>(carrito);
 
-        boolean confirmado = sceneManager.showConfirmation(
-                "Confirmar venta",
-                "Total a cobrar: Q" + total.setScale(2, RoundingMode.HALF_UP),
-                "Cliente: " + cliente + "\n¿Desea confirmar la venta?");
+    Alert generando = new Alert(Alert.AlertType.INFORMATION);
+    generando.setTitle("Procesando venta");
+    generando.setHeaderText(null);
+    generando.setContentText("Generando factura...");
+    generando.show();
 
-        if (!confirmado) {
-            return;
-        }
-
+    PauseTransition espera = new PauseTransition(Duration.seconds(3));
+    espera.setOnFinished(event -> {
+        generando.close();
         try {
-            for (CarritoItem item : carrito) {
-                dashboardService.descontarStock(item.getProducto().getIdProducto(), item.getCantidad());
-            }
-
+            FacturaPdfGenerator.generar(cliente, carritoVenta, total);
             sceneManager.showAlertInfo("Venta realizada", "Compra exitosa",
-                    "Se vendio un total de Q" + total.setScale(2, RoundingMode.HALF_UP), Alert.AlertType.INFORMATION);
-
-            carrito.clear();
-            actualizarResumenCarrito();
-            handleLoadDataTableView();
-            filtrarProductos(txtBuscarProducto.getText());
-        } catch (RuntimeException e) {
-            sceneManager.showAlertInfo("Error en la venta", "No se pudo completar la compra",
+                    "Se vendio un total de Q" + total.setScale(2, RoundingMode.HALF_UP)
+                            + "\nSe genero la factura en PDF.", Alert.AlertType.INFORMATION);
+        } catch (Exception e) {
+            sceneManager.showAlertInfo("Error al generar factura", "No se pudo crear el PDF",
                     e.getMessage(), Alert.AlertType.ERROR);
         }
-    }
+    });
+    espera.play();
+
+    carrito.clear();
+    actualizarResumenCarrito();
+    handleLoadDataTableView();
+    filtrarProductos(txtBuscarProducto.getText());
+}
 
     private void handleQuitarDelCarrito() {
         CarritoItem seleccionado = listViewCarrito.getSelectionModel().getSelectedItem();

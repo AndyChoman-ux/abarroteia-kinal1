@@ -1,0 +1,63 @@
+.dialog-pane {
+    -fx-background-color: #FDF3E7;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.35), 18, 0, 0, 6);
+    -fx-min-width: 400px;
+}
+
+.dialog-pane > *.header-panel {
+    -fx-background-color: #2E7D32;
+    -fx-background-radius: 18 18 0 0;
+    -fx-padding: 18 22;
+}
+
+.dialog-pane > *.header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane > *.content {
+    -fx-background-color: #FDF3E7;
+}
+
+.dialog-pane > *.content.label {
+    -fx-text-fill: #6D4C41;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 14 22;
+}
+
+.dialog-pane .text-field {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #E2C9A0;
+    -fx-border-radius: 8;
+    -fx-padding: 8 12;
+    -fx-font-size: 13px;
+}
+
+.dialog-pane .text-field:focused {
+    -fx-border-color: #2E7D32;
+}
+
+.dialog-pane .button-bar {
+    -fx-background-color: #FDF3E7;
+    -fx-padding: 10 22 18 22;
+}
+
+.dialog-pane .button {
+    -fx-background-radius: 22;
+    -fx-padding: 9 22;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-color: #F5C89A;
+    -fx-text-fill: #8D4E1F;
+}
+
+.dialog-pane .button:default {
+    -fx-background-color: #C0522A;
+    -fx-text-fill: white;
+}
