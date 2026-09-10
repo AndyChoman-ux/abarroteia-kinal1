@@ -96,3 +96,24 @@
 .register-link:hover {
     -fx-underline: true;
 }
+
+.register-title {
+    -fx-text-fill: #16324F;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 0 2 0;
+}
+
+.btn-registrar {
+    -fx-background-color: #2E9E4F;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-pref-height: 44px;
+    -fx-cursor: hand;
+}
+
+.btn-registrar:hover {
+    -fx-background-color: #258241;
+}

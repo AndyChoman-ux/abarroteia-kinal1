@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import main.java.com.vyorg.abarroteria.kinal.controller.LoginController;
 import main.java.com.vyorg.abarroteria.kinal.controller.DashboardController;
+import main.java.com.vyorg.abarroteria.kinal.controller.RegistroController;
 import main.java.com.vyorg.abarroteria.kinal.repository.AuthRepository;
 import main.java.com.vyorg.abarroteria.kinal.repository.ProductoRepository;
 import main.java.com.vyorg.abarroteria.kinal.service.AuthService;
@@ -38,6 +39,17 @@ public class SceneManager {
         stage.show();
     }
 
+    public void showRegistroView() throws Exception {
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/registro-view.fxml")); // Ajusta la ruta si es distinta
+    AuthService authService = new AuthService(new AuthRepository());
+    loader.setControllerFactory(c -> new RegistroController(authService, this));
+
+    Parent root = loader.load();
+    stage.setScene(new Scene(root));
+    stage.setTitle("Registro de Usuario - Abarroteria Kinal");
+    stage.show();
+}
+    
     public void showDashboardView() throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/dashboard-view.fxml"));
         DashboardService dashboardService = new DashboardService(new ProductoRepository());
@@ -66,4 +78,6 @@ public class SceneManager {
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
     }
+    
+    
 }
