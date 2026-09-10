@@ -117,3 +117,10 @@
     -fx-padding: 9 16;
 }
 .btn-secundario:hover { -fx-background-color: #CFD8DC; }
+
+
+.boton-redondo {
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-padding: 0;
+}
