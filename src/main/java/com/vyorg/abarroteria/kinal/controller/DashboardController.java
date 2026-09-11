@@ -60,6 +60,8 @@ public class DashboardController implements Initializable {
     @FXML
     private Button btnCerrarSesion;
     @FXML
+    private Label lblBadgeNotificaciones;
+    @FXML
     private ComboBox<String> cbListaPrecio;
     @FXML
     private ComboBox<String> cbNumeracion;
@@ -114,6 +116,7 @@ public class DashboardController implements Initializable {
         txtBuscarProducto.textProperty().addListener((obs, oldValue, newValue) -> filtrarProductos(newValue));
 
         actualizarResumenCarrito();
+        actualizarBadgeNotificaciones();
     }
 
     private void handleLoadDataTableView() {
@@ -196,10 +199,18 @@ public class DashboardController implements Initializable {
     @FXML
     private void handleVerNotificaciones(javafx.event.ActionEvent event) {
         try {
-            sceneManager.showNotificacionesPopup((javafx.scene.Node) event.getSource());
+            sceneManager.showNotificacionesPopup((javafx.scene.Node) event.getSource(), this::actualizarBadgeNotificaciones);
         } catch (Exception e) {
             sceneManager.showAlertInfo("Error", "No se pudo abrir notificaciones", e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private void actualizarBadgeNotificaciones() {
+        int noLeidas = notificacionService.contarNoLeidas();
+        lblBadgeNotificaciones.setText(String.valueOf(noLeidas));
+        boolean hayNoLeidas = noLeidas > 0;
+        lblBadgeNotificaciones.setVisible(hayNoLeidas);
+        lblBadgeNotificaciones.setManaged(hayNoLeidas);
     }
 
     @FXML
@@ -267,7 +278,9 @@ Optional<String> resultado = dialog.showAndWait();
 
         if (cantidadEnCarrito + cantidad > seleccionado.getStock()) {
             notificacionService.crearNotificacion("Stock insuficiente",
-                    "Solo hay " + seleccionado.getStock() + " unidades disponibles de " + seleccionado.getNombreProducto());
+                    "Solo hay " + seleccionado.getStock() + " unidades disponibles de " + seleccionado.getNombreProducto(),
+                    seleccionado.getIdProducto(), seleccionado.getNombreProducto());
+            actualizarBadgeNotificaciones();
             sceneManager.showAlertInfo("Stock insuficiente", "No hay suficiente stock",
                     "Solo hay " + seleccionado.getStock() + " unidades disponibles de "
                             + seleccionado.getNombreProducto(), Alert.AlertType.WARNING);
@@ -379,6 +392,7 @@ private void handleComprar() {
     actualizarResumenCarrito();
     handleLoadDataTableView();
     filtrarProductos(txtBuscarProducto.getText());
+    actualizarBadgeNotificaciones();
 }
 
     private void handleQuitarDelCarrito() {

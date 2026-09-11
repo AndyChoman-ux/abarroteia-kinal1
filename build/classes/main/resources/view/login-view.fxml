@@ -34,6 +34,7 @@
                      </image>
                   </ImageView>
                   <Label styleClass="login-title" text="Iniciar Sesión" />
+                  <Label styleClass="login-subtitle" text="¡Su Despensa de Confianza desde 1995!" />
                   <HBox alignment="CENTER_LEFT" styleClass="input-wrapper">
                      <children>
                         <Label styleClass="input-icon" text="👤" />

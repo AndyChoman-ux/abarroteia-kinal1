@@ -5,10 +5,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 import javafx.scene.control.Dialog;
@@ -24,7 +26,6 @@ import main.java.com.vyorg.abarroteria.kinal.service.AuthService;
 import main.java.com.vyorg.abarroteria.kinal.service.DashboardService;
 import main.java.com.vyorg.abarroteria.kinal.service.NotificacionService;
 import javafx.scene.control.DialogPane;
-
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -33,13 +34,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
-
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
 public class SceneManager {
 
     private Stage stage;
+    private final SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public SceneManager(Stage stage) {
         this.stage = stage;
@@ -70,7 +72,7 @@ public class SceneManager {
         stage.setTitle("Registro de Usuario - Abarroteria Kinal");
         stage.show();
     }
-    
+
     public void showDashboardView() throws Exception {
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/main/resources/img/login-logo.png")));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/dashboard-view.fxml"));
@@ -83,18 +85,68 @@ public class SceneManager {
         stage.show();
     }
 
+    /** Mantiene compatibilidad con lugares donde no se necesita refrescar un contador (ej. dashboard admin). */
     public void showNotificacionesPopup(Node anchor) {
-        List<Notificacion> notificaciones = new NotificacionService().listarNotificaciones();
+        showNotificacionesPopup(anchor, null);
+    }
+
+    public void showNotificacionesPopup(Node anchor, Runnable actualizarBadge) {
+        NotificacionService notificacionService = new NotificacionService();
 
         VBox contenedor = new VBox(10);
         contenedor.setPadding(new Insets(15));
-        contenedor.setPrefWidth(300);
+        contenedor.setPrefWidth(320);
         contenedor.setStyle("-fx-background-color: white; -fx-background-radius: 12; "
                 + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0, 0, 4);");
 
+        Popup popup = new Popup();
+        popup.setAutoHide(true);
+        popup.getContent().add(contenedor);
+
+        refrescarContenidoNotificaciones(popup, contenedor, notificacionService, actualizarBadge);
+
+        if (actualizarBadge != null) {
+            popup.setOnHidden(e -> actualizarBadge.run());
+        }
+
+        Bounds bounds = anchor.localToScreen(anchor.getBoundsInLocal());
+        popup.show(anchor, bounds.getMinX() - 270, bounds.getMaxY() + 8);
+    }
+
+    private void refrescarContenidoNotificaciones(Popup popup, VBox contenedor,
+                                                   NotificacionService notificacionService, Runnable actualizarBadge) {
+        contenedor.getChildren().clear();
+
+        List<Notificacion> notificaciones = notificacionService.listarNotificaciones();
+
+        HBox encabezado = new HBox();
+        encabezado.setAlignment(Pos.CENTER_LEFT);
+
         Label titulo = new Label("Notificaciones recientes");
         titulo.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        contenedor.getChildren().add(titulo);
+        HBox.setHgrow(titulo, Priority.ALWAYS);
+
+        Button btnEliminarTodas = new Button("Eliminar todas");
+        btnEliminarTodas.setStyle("-fx-background-color: transparent; -fx-text-fill: #E53935; "
+                + "-fx-font-size: 11px; -fx-underline: true; -fx-cursor: hand;");
+        btnEliminarTodas.setDisable(notificaciones.isEmpty());
+        btnEliminarTodas.setOnAction(e -> {
+            popup.setAutoHide(false);
+            boolean confirmado = showConfirmation(
+                    "Eliminar notificaciones",
+                    "Eliminar todas las notificaciones",
+                    "Esta accion no se puede deshacer. ¿Desea eliminar todas las notificaciones?");
+            popup.setAutoHide(true);
+
+            if (confirmado) {
+                notificacionService.eliminarTodas();
+                refrescarContenidoNotificaciones(popup, contenedor, notificacionService, actualizarBadge);
+                if (actualizarBadge != null) actualizarBadge.run();
+            }
+        });
+
+        encabezado.getChildren().addAll(titulo, btnEliminarTodas);
+        contenedor.getChildren().add(encabezado);
 
         if (notificaciones.isEmpty()) {
             Label vacio = new Label("No hay notificaciones");
@@ -102,26 +154,122 @@ public class SceneManager {
             contenedor.getChildren().add(vacio);
         } else {
             for (Notificacion n : notificaciones) {
-                contenedor.getChildren().add(crearItemNotificacion(n));
+                contenedor.getChildren().add(crearItemNotificacion(popup, n, notificacionService, contenedor, actualizarBadge));
             }
         }
-
-        Popup popup = new Popup();
-        popup.setAutoHide(true);
-        popup.getContent().add(contenedor);
-
-        Bounds bounds = anchor.localToScreen(anchor.getBoundsInLocal());
-        popup.show(anchor, bounds.getMinX() - 250, bounds.getMaxY() + 8);
     }
+
+    private HBox crearItemNotificacion(Popup popup, Notificacion n, NotificacionService notificacionService,
+                                        VBox contenedorPadre, Runnable actualizarBadge) {
+        HBox fila = new HBox(10);
+        fila.setAlignment(Pos.TOP_LEFT);
+        fila.setPadding(new Insets(6));
+        fila.setStyle(n.isLeida()
+                ? "-fx-cursor: hand;"
+                : "-fx-cursor: hand; -fx-background-color: #F1F8E9; -fx-background-radius: 8;");
+
+        Label icono = new Label(iconoParaTitulo(n.getTitulo()));
+        icono.setStyle("-fx-font-size: 18px;");
+
+        VBox textos = new VBox(2);
+        Label tituloLbl = new Label(n.getTitulo());
+        tituloLbl.setStyle("-fx-font-weight: bold;");
+        Label mensajeLbl = new Label(n.getMensaje());
+        mensajeLbl.setWrapText(true);
+        mensajeLbl.setMaxWidth(170);
+        mensajeLbl.setStyle("-fx-text-fill: #616161; -fx-font-size: 12px;");
+        Label tiempo = new Label(tiempoTranscurrido(n.getFecha()));
+        tiempo.setStyle("-fx-text-fill: #9e9e9e; -fx-font-size: 11px;");
+        textos.getChildren().addAll(tituloLbl, mensajeLbl, tiempo);
+        HBox.setHgrow(textos, Priority.ALWAYS);
+
+        Button btnEliminar = new Button("🗑");
+        btnEliminar.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
+        btnEliminar.setOnMouseClicked(e -> e.consume());
+        btnEliminar.setOnAction(e -> {
+            notificacionService.eliminarNotificacion(n.getIdNotificacion());
+            refrescarContenidoNotificaciones(popup, contenedorPadre, notificacionService, actualizarBadge);
+            if (actualizarBadge != null) actualizarBadge.run();
+        });
+
+        fila.getChildren().addAll(icono, textos, btnEliminar);
+        fila.setOnMouseClicked(e -> mostrarDetalleNotificacion(popup, n, notificacionService, contenedorPadre, actualizarBadge));
+
+        return fila;
+    }
+
+   private void mostrarDetalleNotificacion(Popup popup, Notificacion n, NotificacionService notificacionService,
+                                         VBox contenedorPadre, Runnable actualizarBadge) {
+    // En vez de abrir una ventana (Dialog) aparte, se reemplaza el contenido
+    // del mismo popup por la vista de detalle, manteniendo los mismos botones.
+    contenedorPadre.getChildren().clear();
+
+    HBox encabezado = new HBox(8);
+    encabezado.setAlignment(Pos.CENTER_LEFT);
+
+    Button btnVolver = new Button("←");
+    btnVolver.setStyle("-fx-background-color: transparent; -fx-font-size: 16px; -fx-cursor: hand;");
+    btnVolver.setOnAction(e -> {
+        notificacionService.marcarComoLeida(n.getIdNotificacion());
+        refrescarContenidoNotificaciones(popup, contenedorPadre, notificacionService, actualizarBadge);
+        if (actualizarBadge != null) actualizarBadge.run();
+    });
+
+    Label encabezadoTitulo = new Label("Detalle de notificacion");
+    encabezadoTitulo.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+    encabezado.getChildren().addAll(btnVolver, encabezadoTitulo);
+    contenedorPadre.getChildren().add(encabezado);
+
+    VBox contenido = new VBox(10);
+    contenido.setPadding(new Insets(10, 0, 10, 0));
+
+    Label titulo = new Label(n.getTitulo());
+    titulo.setWrapText(true);
+    titulo.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;");
+
+    Label producto = new Label("Producto: " + (n.getProductoNombre() == null ? "N/A" : n.getProductoNombre()));
+    producto.setWrapText(true);
+    Label idProducto = new Label("ID producto: " + (n.getIdProducto() == null ? "N/A" : n.getIdProducto()));
+    Label mensaje = new Label(n.getMensaje());
+    mensaje.setWrapText(true);
+    mensaje.setMaxWidth(280);
+    Label fecha = new Label("Fecha: " + (n.getFecha() == null ? "" : formatoFecha.format(n.getFecha())));
+
+    contenido.getChildren().addAll(titulo, producto, idProducto, mensaje, fecha);
+    contenedorPadre.getChildren().add(contenido);
+
+    HBox botones = new HBox(10);
+    botones.setAlignment(Pos.CENTER_RIGHT);
+
+    Button btnCerrar = new Button("Cerrar");
+    btnCerrar.setStyle("-fx-background-radius: 22; -fx-padding: 9 22; -fx-font-size: 13px; "
+            + "-fx-font-weight: bold; -fx-cursor: hand; -fx-background-color: #F5C89A; -fx-text-fill: #8D4E1F;");
+    btnCerrar.setOnAction(e -> {
+        notificacionService.marcarComoLeida(n.getIdNotificacion());
+        refrescarContenidoNotificaciones(popup, contenedorPadre, notificacionService, actualizarBadge);
+        if (actualizarBadge != null) actualizarBadge.run();
+    });
+
+    Button btnEliminar = new Button("Eliminar notificacion");
+    btnEliminar.setStyle("-fx-background-radius: 22; -fx-padding: 9 22; -fx-font-size: 13px; "
+            + "-fx-font-weight: bold; -fx-cursor: hand; -fx-background-color: #C0522A; -fx-text-fill: white;");
+    btnEliminar.setOnAction(e -> {
+        notificacionService.eliminarNotificacion(n.getIdNotificacion());
+        refrescarContenidoNotificaciones(popup, contenedorPadre, notificacionService, actualizarBadge);
+        if (actualizarBadge != null) actualizarBadge.run();
+    });
+
+    botones.getChildren().addAll(btnCerrar, btnEliminar);
+    contenedorPadre.getChildren().add(botones);
+}
 
    public void showHistorialVentas() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/historial-ventas-view.fxml"));
-            
-            // 1. Cargar el FXML primero para instanciar la vista y el controlador
+
             Parent root = loader.load();
 
-            // 2. Obtener el controlador YA inicializado
             HistorialVentasController controller = loader.getController();
             if (controller != null) {
                 controller.setSceneManager(this);
@@ -133,30 +281,6 @@ public class SceneManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private HBox crearItemNotificacion(Notificacion n) {
-        HBox fila = new HBox(10);
-        fila.setAlignment(Pos.TOP_LEFT);
-
-        Label icono = new Label(iconoParaTitulo(n.getTitulo()));
-        icono.setStyle("-fx-font-size: 18px;");
-
-        VBox textos = new VBox(2);
-        Label tituloLbl = new Label(n.getTitulo());
-        tituloLbl.setStyle("-fx-font-weight: bold;");
-        Label mensajeLbl = new Label(n.getMensaje());
-        mensajeLbl.setWrapText(true);
-        mensajeLbl.setMaxWidth(200);
-        mensajeLbl.setStyle("-fx-text-fill: #616161; -fx-font-size: 12px;");
-        textos.getChildren().addAll(tituloLbl, mensajeLbl);
-        HBox.setHgrow(textos, Priority.ALWAYS);
-
-        Label tiempo = new Label(tiempoTranscurrido(n.getFecha()));
-        tiempo.setStyle("-fx-text-fill: #9e9e9e; -fx-font-size: 11px;");
-
-        fila.getChildren().addAll(icono, textos, tiempo);
-        return fila;
     }
 
     private String iconoParaTitulo(String titulo) {

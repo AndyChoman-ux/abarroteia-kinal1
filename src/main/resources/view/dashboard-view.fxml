@@ -32,24 +32,37 @@
                <children>
                   <StackPane alignment="CENTER">
                      <children>
-                        <Label styleClass="app-title" text="Abarroteria Kinal" />
+                        <ImageView fitWidth="480.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/titulo-banner.png" />
+                           </image>
+                        </ImageView>
                         <ImageView fitHeight="103.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER_LEFT">
                            <image>
                               <Image url="@../img/login-logo.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;" StackPane.alignment="TOP_RIGHT">
-                           <graphic>
-                              <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../img/bell-icon.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="50.0" prefWidth="50.0" StackPane.alignment="TOP_RIGHT">
                            <StackPane.margin>
                               <Insets right="10.0" top="10.0" />
                            </StackPane.margin>
-                        </Button>
+                           <children>
+                              <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;">
+                                 <graphic>
+                                    <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/bell-icon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Label fx:id="lblBadgeNotificaciones" managed="false" text="0" visible="false" StackPane.alignment="TOP_RIGHT" style="-fx-background-color: #E53935; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 1 5 1 5;">
+                                 <StackPane.margin>
+                                    <Insets right="2.0" top="2.0" />
+                                 </StackPane.margin>
+                              </Label>
+                           </children>
+                        </StackPane>
                         <Button fx:id="btnHistorialVentas" mnemonicParsing="false" onAction="#handleVerHistorial" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #43A047; -fx-text-fill: white;" text="Historial de ventas " StackPane.alignment="TOP_RIGHT">
                            <font>
                               <Font name="Georgia" size="14.0" />
@@ -137,13 +150,10 @@
                   <ListView fx:id="listViewCarrito" styleClass="cart-list" VBox.vgrow="ALWAYS" />
                   <VBox spacing="6.0">
                      <children>
-                        <HBox alignment="CENTER_LEFT">
+                        <HBox alignment="CENTER_LEFT" styleClass="total-box">
                            <children>
-                              <Label styleClass="label-vender" text="  Total" textOverrun="WORD_ELLIPSIS" HBox.hgrow="ALWAYS">
-                                 <font>
-                                    <Font name="Baskerville Old Face" size="52.0" />
-                                 </font></Label>
-                              <Label fx:id="lblTotal" styleClass="label-total" text="                                 Q0.00" />
+                              <Label maxWidth="1.7976931348623157E308" styleClass="label-total-texto" text="Total" HBox.hgrow="ALWAYS" />
+                              <Label fx:id="lblTotal" styleClass="label-total" text="Q0.00" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
