@@ -16,7 +16,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0" prefWidth="760.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardController">   <children>
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0" prefWidth="760.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardController">
+   <children>
       <ImageView fitHeight="560.0" fitWidth="760.0" opacity="0.18">
          <image>
             <Image url="@../img/login-background.png" />
@@ -29,7 +30,7 @@
                   <Insets bottom="14.0" left="20.0" right="20.0" top="18.0" />
                </padding>
                <children>
-                                   <StackPane alignment="CENTER">
+                  <StackPane alignment="CENTER">
                      <children>
                         <Label styleClass="app-title" text="Abarroteria Kinal" />
                         <ImageView fitHeight="103.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER_LEFT">
@@ -37,6 +38,26 @@
                               <Image url="@../img/login-logo.png" />
                            </image>
                         </ImageView>
+                        <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;" StackPane.alignment="TOP_RIGHT">
+                           <graphic>
+                              <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/bell-icon.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <StackPane.margin>
+                              <Insets right="10.0" top="10.0" />
+                           </StackPane.margin>
+                        </Button>
+                        <Button fx:id="btnHistorialVentas" mnemonicParsing="false" onAction="#handleVerHistorial" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #43A047; -fx-text-fill: white;" text="Historial de ventas " StackPane.alignment="TOP_RIGHT">
+                           <font>
+                              <Font name="Georgia" size="14.0" />
+                           </font>
+                           <StackPane.margin>
+                              <Insets right="10.0" top="65.0" />
+                           </StackPane.margin>
+                        </Button>
                      </children>
                   </StackPane>
                   <HBox alignment="CENTER_LEFT" maxWidth="440.0" styleClass="search-box">
@@ -107,6 +128,12 @@
                         </HBox>
                      </children>
                   </VBox>
+                  <VBox spacing="4.0">
+   <children>
+      <Label styleClass="label-gris" text="Método de pago" />
+      <ComboBox fx:id="cbMetodoPago" maxWidth="1.7976931348623157E308" styleClass="campo" />
+   </children>
+</VBox>
                   <ListView fx:id="listViewCarrito" styleClass="cart-list" VBox.vgrow="ALWAYS" />
                   <VBox spacing="6.0">
                      <children>

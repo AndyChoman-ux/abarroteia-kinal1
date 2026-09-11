@@ -20,12 +20,12 @@ public class FacturaPdfGenerator {
     private static final Color VERDE = new Color(46, 125, 50);   // #2E7D32
     private static final Color NARANJA = new Color(230, 81, 0);  // #E65100
 
-    public static File generar(String cliente, List<CarritoItem> carrito, BigDecimal total) throws Exception {
+    public static File generar(int idVenta, String cliente, List<CarritoItem> carrito, BigDecimal total) throws Exception {
         Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
 
         File carpeta = new File(System.getProperty("user.home"), "Facturas_Kinal");
         if (!carpeta.exists()) carpeta.mkdirs();
-        File archivo = new File(carpeta, "factura_" + System.currentTimeMillis() + ".pdf");
+        File archivo = new File(carpeta, "factura_" + idVenta + ".pdf");
 
         PdfWriter.getInstance(doc, new FileOutputStream(archivo));
         doc.open();
@@ -56,7 +56,7 @@ public class FacturaPdfGenerator {
         doc.add(new Paragraph(" "));
 
         String serie = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String numero = String.valueOf(System.currentTimeMillis());
+        String numero = String.valueOf(idVenta);
         String fecha = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
 
         PdfPTable datosFactura = new PdfPTable(3);

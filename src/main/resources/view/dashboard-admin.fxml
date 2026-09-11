@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0" prefWidth="760.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0" prefWidth="760.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardAdminController">
    <children>
       <ImageView fitHeight="560.0" fitWidth="760.0" opacity="0.18" pickOnBounds="true">
          <image>
@@ -45,22 +45,26 @@
                               <Insets left="10.0" top="10.0" />
                            </StackPane.margin>
                         </ImageView>
-                        <Button alignment="CENTER" mnemonicParsing="false" prefHeight="28.0" prefWidth="42.0" style="-fx-background-color: #43A047;" styleClass="boton-redondo" text="🔔" StackPane.alignment="TOP_RIGHT">
-                           <font>
-                              <Font size="29.0" />
-                           </font>
+                        <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;" StackPane.alignment="TOP_RIGHT">
+                           <graphic>
+                              <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/bell-icon.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
                            <StackPane.margin>
                               <Insets right="10.0" top="10.0" />
                            </StackPane.margin>
                         </Button>
-                        <Button mnemonicParsing="false" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #43A047; -fx-text-fill: white;" text="Historial de ventas " StackPane.alignment="TOP_RIGHT">
-                           <font>
-                              <Font name="Georgia" size="14.0" />
-                           </font>
-                           <StackPane.margin>
-                              <Insets right="10.0" top="65.0" />
-                           </StackPane.margin>
-                        </Button>
+                        <Button fx:id="btnHistorialVentas" mnemonicParsing="false" onAction="#handleVerHistorial" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #43A047; -fx-text-fill: white;" text="Historial de ventas " StackPane.alignment="TOP_RIGHT">
+   <font>
+      <Font name="Georgia" size="14.0" />
+   </font>
+   <StackPane.margin>
+      <Insets right="10.0" top="65.0" />
+   </StackPane.margin>
+</Button>
                      </children>
                   </StackPane>
                   <HBox alignment="CENTER_LEFT" maxWidth="440.0" styleClass="search-box">
