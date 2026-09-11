@@ -1,5 +1,6 @@
 package main.java.com.vyorg.abarroteria.kinal.controller;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -21,9 +22,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import main.java.com.vyorg.abarroteria.kinal.model.CarritoItem;
+import main.java.com.vyorg.abarroteria.kinal.model.DetalleVenta;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 import main.java.com.vyorg.abarroteria.kinal.service.DashboardService;
+import main.java.com.vyorg.abarroteria.kinal.service.HistorialVentasService;
+import main.java.com.vyorg.abarroteria.kinal.service.NotificacionService;
 import main.java.com.vyorg.abarroteria.kinal.util.SceneManager;
+import main.java.com.vyorg.abarroteria.kinal.util.SesionUsuario;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.animation.PauseTransition;
@@ -59,6 +64,8 @@ public class DashboardController implements Initializable {
     @FXML
     private ComboBox<String> cbNumeracion;
     @FXML
+    private ComboBox<String> cbMetodoPago;
+    @FXML
     private TextField txtCliente;
     @FXML
     private ListView<CarritoItem> listViewCarrito;
@@ -76,6 +83,8 @@ public class DashboardController implements Initializable {
     private ObservableList<Producto> listaProductos;
     private FilteredList<Producto> productosFiltrados;
     private final ObservableList<CarritoItem> carrito = FXCollections.observableArrayList();
+    private final NotificacionService notificacionService = new NotificacionService();
+    private final HistorialVentasService historialVentasService = new HistorialVentasService();
 
     public DashboardController(DashboardService dashboardService, SceneManager sceneManager) {
         this.dashboardService = dashboardService;
@@ -91,6 +100,9 @@ public class DashboardController implements Initializable {
 
         cbNumeracion.setItems(FXCollections.observableArrayList("Ticket principal", "Ticket secundario"));
         cbNumeracion.getSelectionModel().selectFirst();
+
+        cbMetodoPago.setItems(FXCollections.observableArrayList("Efectivo", "Tarjeta Cred."));
+        cbMetodoPago.getSelectionModel().selectFirst();
 
         listViewCarrito.setItems(carrito);
         listViewCarrito.setOnMouseClicked(event -> {
@@ -173,10 +185,29 @@ public class DashboardController implements Initializable {
         }
 
         try {
+            SesionUsuario.cerrarSesion();
             sceneManager.showLoginView();
         } catch (Exception e) {
             sceneManager.showAlertInfo("Error al cerrar sesion", "No se pudo cerrar sesion",
                     e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void handleVerNotificaciones(javafx.event.ActionEvent event) {
+        try {
+            sceneManager.showNotificacionesPopup((javafx.scene.Node) event.getSource());
+        } catch (Exception e) {
+            sceneManager.showAlertInfo("Error", "No se pudo abrir notificaciones", e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void handleVerHistorial() {
+        try {
+            sceneManager.showHistorialVentas();
+        } catch (Exception e) {
+            sceneManager.showAlertInfo("Error", "No se pudo abrir el historial", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -235,6 +266,8 @@ Optional<String> resultado = dialog.showAndWait();
         int cantidadEnCarrito = itemExistente == null ? 0 : itemExistente.getCantidad();
 
         if (cantidadEnCarrito + cantidad > seleccionado.getStock()) {
+            notificacionService.crearNotificacion("Stock insuficiente",
+                    "Solo hay " + seleccionado.getStock() + " unidades disponibles de " + seleccionado.getNombreProducto());
             sceneManager.showAlertInfo("Stock insuficiente", "No hay suficiente stock",
                     "Solo hay " + seleccionado.getStock() + " unidades disponibles de "
                             + seleccionado.getNombreProducto(), Alert.AlertType.WARNING);
@@ -270,7 +303,7 @@ Optional<String> resultado = dialog.showAndWait();
         actualizarResumenCarrito();
     }
 
-   
+
    @FXML
 private void handleComprar() {
     if (carrito.isEmpty()) {
@@ -282,6 +315,8 @@ private void handleComprar() {
     BigDecimal total = calcularTotal();
     String cliente = txtCliente.getText() == null || txtCliente.getText().isBlank()
             ? "Publico en general" : txtCliente.getText();
+    String metodoPago = cbMetodoPago.getValue() == null ? "Efectivo" : cbMetodoPago.getValue();
+    String vendedor = SesionUsuario.getNombreUsuario();
 
     boolean confirmado = sceneManager.showConfirmation(
             "Confirmar venta",
@@ -302,7 +337,21 @@ private void handleComprar() {
         return;
     }
 
+    int idVenta = historialVentasService.registrarVenta(cliente, total.doubleValue(), metodoPago, vendedor);
+
     List<CarritoItem> carritoVenta = new ArrayList<>(carrito);
+
+    List<DetalleVenta> detalles = new ArrayList<>();
+    for (CarritoItem item : carritoVenta) {
+        detalles.add(new DetalleVenta(
+                item.getProducto().getIdProducto(),
+                item.getProducto().getNombreProducto(),
+                item.getCantidad(),
+                item.getProducto().getPrecio().doubleValue(),
+                item.getSubtotal().doubleValue()
+        ));
+    }
+    historialVentasService.registrarDetalleVenta(idVenta, detalles);
 
     Alert generando = new Alert(Alert.AlertType.INFORMATION);
     generando.setTitle("Procesando venta");
@@ -314,7 +363,8 @@ private void handleComprar() {
     espera.setOnFinished(event -> {
         generando.close();
         try {
-            FacturaPdfGenerator.generar(cliente, carritoVenta, total);
+            File factura = FacturaPdfGenerator.generar(idVenta, cliente, carritoVenta, total);
+            historialVentasService.actualizarFactura(idVenta, factura.getAbsolutePath());
             sceneManager.showAlertInfo("Venta realizada", "Compra exitosa",
                     "Se vendio un total de Q" + total.setScale(2, RoundingMode.HALF_UP)
                             + "\nSe genero la factura en PDF.", Alert.AlertType.INFORMATION);

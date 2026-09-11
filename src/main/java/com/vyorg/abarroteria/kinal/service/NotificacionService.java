@@ -16,4 +16,8 @@ public class NotificacionService {
     public List<Notificacion> listarNotificaciones() {
         return notificacionRepository.obtenerTodas();
     }
+
+    public void crearNotificacion(String titulo, String mensaje) {
+        notificacionRepository.insertar(titulo, mensaje);
+    }
 }

@@ -36,4 +36,16 @@ public class NotificacionRepository {
 
         return lista;
     }
+
+    public void insertar(String titulo, String mensaje) {
+        String sql = "insert into notificaciones (titulo, mensaje, fecha, leida) values (?, ?, now(), false)";
+        try (Connection conn = DataBaseConnection.getDataBaseConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, titulo);
+            stmt.setString(2, mensaje);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

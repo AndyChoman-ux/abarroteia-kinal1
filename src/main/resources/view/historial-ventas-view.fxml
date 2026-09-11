@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.HistorialVentasController">
+<AnchorPane prefHeight="560.0" prefWidth="920.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.HistorialVentasController">
    <children>
       <VBox spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
          <children>
-            <!-- Título de la sección -->
-            <Label text="Historial de Ventas" textFill="#2c3e50">
-               <font>
-                  <Font name="System Bold" size="22.0" />
-               </font>
-            </Label>
+            <!-- ENCABEZADO CON BOTÓN Y TÍTULO -->
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <children>
+                  <Button fx:id="btnRegresar" onAction="#handleRegresarAction" style="-fx-background-color: #757575; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 5px; -fx-padding: 8 15;" text="← Regresar" />
+                  <Label text="Registro de Ventas y Facturas" textFill="#2e7d32">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
 
-            <!-- Tabla para mostrar las ventas de MySQL -->
-            <TableView fx:id="tblVentas" prefHeight="400.0" prefWidth="660.0" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tblVentas" prefHeight="460.0" prefWidth="880.0" VBox.vgrow="ALWAYS">
                <columns>
-                  <TableColumn fx:id="colId" prefWidth="100.0" text="ID Venta" />
-                  <TableColumn fx:id="colFecha" prefWidth="200.0" text="Fecha y Hora" />
-                  <TableColumn fx:id="colCliente" prefWidth="220.0" text="Cliente" />
-                  <TableColumn fx:id="colTotal" prefWidth="130.0" text="Total (Q)" />
+                  <TableColumn fx:id="colFactura" prefWidth="110.0" text="Num. Factura" />
+                  <TableColumn fx:id="colFecha" prefWidth="160.0" text="Fecha" />
+                  <TableColumn fx:id="colCliente" prefWidth="170.0" text="Cliente" />
+                  <TableColumn fx:id="colMetodoPago" prefWidth="120.0" text="Método Pago" />
+                  <TableColumn fx:id="colTotal" prefWidth="100.0" text="Total (Q)" />
+                  <TableColumn fx:id="colEstado" prefWidth="100.0" text="Estado" />
+                  <TableColumn fx:id="colAcciones" prefWidth="110.0" text="Acciones" />
                </columns>
+               <placeholder>
+                  <Label text="Aún no hay ventas registradas" />
+               </placeholder>
             </TableView>
          </children>
          <padding>

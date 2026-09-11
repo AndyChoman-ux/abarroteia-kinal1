@@ -1,5 +1,6 @@
 package main.java.com.vyorg.abarroteria.kinal.service;
 
+import main.java.com.vyorg.abarroteria.kinal.model.DetalleVenta;
 import main.java.com.vyorg.abarroteria.kinal.model.Venta;
 import main.java.com.vyorg.abarroteria.kinal.repository.VentaRepository;
 
@@ -14,7 +15,22 @@ public class HistorialVentasService {
     }
 
     public List<Venta> listarHistorial() {
-        // Aquí se pueden agregar validaciones o filtros si se requiere en el futuro
         return ventaRepository.obtenerTodasLasVentas();
+    }
+
+    public int registrarVenta(String cliente, double total, String metodoPago, String vendedor) {
+        return ventaRepository.insertarVenta(cliente, total, metodoPago, vendedor);
+    }
+
+    public void registrarDetalleVenta(int idVenta, List<DetalleVenta> detalles) {
+        ventaRepository.insertarDetalleVenta(idVenta, detalles);
+    }
+
+    public List<DetalleVenta> obtenerDetalleVenta(int idVenta) {
+        return ventaRepository.obtenerDetalleVenta(idVenta);
+    }
+
+    public void actualizarFactura(int idVenta, String rutaFactura) {
+        ventaRepository.actualizarRutaFactura(idVenta, rutaFactura);
     }
 }
