@@ -4,21 +4,31 @@ import javafx.collections.ObservableList;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 import main.java.com.vyorg.abarroteria.kinal.repository.ProductoRepository;
 
-
 public class DashboardService {
 
+    private static final int STOCK_MINIMO = 10;
+
     private final ProductoRepository productoRepository;
+    private final NotificacionService notificacionService;
 
     public DashboardService(ProductoRepository productoRepository) {
+        this(productoRepository, new NotificacionService());
+    }
+
+    public DashboardService(ProductoRepository productoRepository, NotificacionService notificacionService) {
         this.productoRepository = productoRepository;
+        this.notificacionService = notificacionService;
     }
 
     public ObservableList<Producto> findProducto() {
-        if (productoRepository.findAll() == null) {
+        ObservableList<Producto> productos = productoRepository.findAll();
+
+        if (productos == null) {
             throw new RuntimeException("Sin productos");
-        } else {
-            return productoRepository.findAll();
         }
+
+        verificarStockBajo(productos);
+        return productos;
     }
 
     public void eliminarProducto(String idProducto) {
@@ -45,6 +55,17 @@ public class DashboardService {
 
         if (!actualizado) {
             throw new RuntimeException("Stock insuficiente");
+        }
+    }
+
+    private void verificarStockBajo(ObservableList<Producto> productos) {
+        for (Producto producto : productos) {
+            if (producto.getStock() <= STOCK_MINIMO) {
+                String mensaje = "El producto " + producto.getNombreProducto()
+                        + " tiene stock bajo: quedan " + producto.getStock() + " unidades";
+                notificacionService.crearNotificacionSiNoExiste("Stock bajo", mensaje,
+                        producto.getIdProducto(), producto.getNombreProducto());
+            }
         }
     }
 }
