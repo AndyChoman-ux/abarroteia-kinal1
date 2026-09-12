@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import main.java.com.vyorg.abarroteria.kinal.util.SesionUsuario;
 
 public class HistorialVentasController implements Initializable {
 
@@ -67,11 +68,15 @@ public class HistorialVentasController implements Initializable {
     }
 
     // Acción para el botón de regresar (asegúrate de colocar onAction="#handleRegresarAction" en la vista FXML)
-    @FXML
+        @FXML
     private void handleRegresarAction() {
         if (sceneManager != null) {
             try {
-                sceneManager.showDashboardView();
+                if (SesionUsuario.esAdmin()) {
+                    sceneManager.showDashboardAdminView();
+                } else {
+                    sceneManager.showDashboardView();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
