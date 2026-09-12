@@ -69,45 +69,41 @@ public class DashboardService {
             }
         }
     }
-    public void agregarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio) {
+        public void agregarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen) {
         if (idProducto == null || idProducto.isBlank()) {
-            throw new RuntimeException("El ID del producto no es válido");
+            throw new RuntimeException("Debe ingresar un ID de producto");
         }
         if (nombreProducto == null || nombreProducto.isBlank()) {
-            throw new RuntimeException("El nombre del producto no puede estar vacío");
+            throw new RuntimeException("Debe ingresar un nombre de producto");
         }
         if (stock < 0) {
             throw new RuntimeException("El stock no puede ser negativo");
         }
         if (precio == null || precio.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("El precio debe ser un valor válido");
+            throw new RuntimeException("El precio no puede ser negativo");
         }
 
-        Producto nuevoProducto = new Producto(idProducto, nombreProducto, stock, precio);
-        boolean guardado = productoRepository.guardarProducto(nuevoProducto);
-
-        if (!guardado) {
+        boolean agregado = productoRepository.agregarProducto(new Producto(idProducto, nombreProducto, stock, precio, rutaImagen));
+        if (!agregado) {
             throw new RuntimeException("No se pudo agregar el producto");
         }
     }
 
-    public void actualizarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio) {
+    public void actualizarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen) {
         if (idProducto == null || idProducto.isBlank()) {
-            throw new RuntimeException("Debe seleccionar un producto válido");
+            throw new RuntimeException("Debe seleccionar un producto valido");
         }
         if (nombreProducto == null || nombreProducto.isBlank()) {
-            throw new RuntimeException("El nombre del producto no puede estar vacío");
+            throw new RuntimeException("Debe ingresar un nombre de producto");
         }
         if (stock < 0) {
             throw new RuntimeException("El stock no puede ser negativo");
         }
         if (precio == null || precio.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("El precio debe ser un valor válido");
+            throw new RuntimeException("El precio no puede ser negativo");
         }
 
-        Producto productoActualizado = new Producto(idProducto, nombreProducto, stock, precio);
-        boolean actualizado = productoRepository.actualizarProducto(productoActualizado);
-
+        boolean actualizado = productoRepository.actualizarProducto(new Producto(idProducto, nombreProducto, stock, precio, rutaImagen));
         if (!actualizado) {
             throw new RuntimeException("No se pudo actualizar el producto");
         }

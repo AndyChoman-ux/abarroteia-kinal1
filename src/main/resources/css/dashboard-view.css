@@ -163,3 +163,52 @@
     -fx-border-radius: 50%;
     -fx-padding: 0;
 }
+
+.productos-scroll {
+    -fx-background-color: transparent;
+}
+.productos-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.productos-grid {
+    -fx-background-color: transparent;
+}
+
+.producto-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.10), 10, 0, 0, 3);
+    -fx-cursor: hand;
+}
+.producto-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.18), 12, 0, 0, 4);
+}
+
+.producto-card-seleccionada {
+    -fx-border-color: #43A047;
+}
+
+.producto-imagen-marco {
+    -fx-background-color: #F5F7FA;
+    -fx-background-radius: 8;
+}
+
+.producto-id {
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 11px;
+}
+
+.producto-nombre {
+    -fx-text-fill: #263238;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.producto-detalle {
+    -fx-text-fill: #546E7A;
+    -fx-font-size: 12px;
+}
