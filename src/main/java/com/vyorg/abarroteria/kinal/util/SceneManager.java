@@ -37,6 +37,7 @@ import javafx.stage.Popup;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import main.java.com.vyorg.abarroteria.kinal.controller.DashboardAdminController;
 
 public class SceneManager {
 
@@ -74,16 +75,32 @@ public class SceneManager {
     }
 
     public void showDashboardView() throws Exception {
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/main/resources/img/login-logo.png")));
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/dashboard-view.fxml"));
-        DashboardService dashboardService = new DashboardService(new ProductoRepository());
-        loader.setControllerFactory(c -> new DashboardController(dashboardService, this));
+    stage.getIcons().add(new Image(getClass().getResourceAsStream("/main/resources/img/login-logo.png")));
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/dashboard-view.fxml"));
+    DashboardService dashboardService = new DashboardService(new ProductoRepository());
+    loader.setControllerFactory(c -> new DashboardController(dashboardService, this));
 
-        Parent root = loader.load();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Dashboard - Abarroteria Kinal");
-        stage.show();
-    }
+    Parent root = loader.load();
+    stage.setScene(new Scene(root));
+    stage.setTitle("Dashboard - Abarroteria Kinal");
+    stage.sizeToScene();
+    stage.centerOnScreen();
+    stage.show();
+}
+    public void showDashboardAdminView() throws Exception {
+    stage.getIcons().add(new Image(getClass().getResourceAsStream("/main/resources/img/login-logo.png")));
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/dashboard-admin.fxml"));
+    AuthService authService = new AuthService(new AuthRepository());
+    DashboardService dashboardService = new DashboardService(new ProductoRepository());
+    loader.setControllerFactory(c -> new DashboardAdminController(authService, dashboardService, this));
+
+    Parent root = loader.load();
+    stage.setScene(new Scene(root));
+    stage.setTitle("Dashboard Admin - Abarroteria Kinal");
+    stage.sizeToScene();
+    stage.centerOnScreen();
+    stage.show();
+}
 
     /** Mantiene compatibilidad con lugares donde no se necesita refrescar un contador (ej. dashboard admin). */
     public void showNotificacionesPopup(Node anchor) {

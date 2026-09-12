@@ -43,10 +43,15 @@ public class LoginController implements Initializable {
         sceneManager.showAlertInfo("Hay campos sin llenar", "No puedes dejar espacios en blanco","Intente de nuevo", Alert.AlertType.INFORMATION);
     }else{
         try{
-            LoginDTOResponse response = authService.login(new LoginDTORequest(txtFieldEmail.getText(),txtFieldPassword.getText()));
-            SesionUsuario.iniciarSesion(response.getNombre());
+                        LoginDTOResponse response = authService.login(new LoginDTORequest(txtFieldEmail.getText(),txtFieldPassword.getText()));
+            boolean esAdmin = response.getIdRol() == 1;
+            SesionUsuario.iniciarSesion(response.getNombre(), esAdmin);
             sceneManager.showAlertInfo("Bienvenido: " + response.getNombre(), "Es bueno verte:", "Inicio de sesion correcto", Alert.AlertType.INFORMATION);
-             sceneManager.showDashboardView();
+             if (esAdmin) {
+                 sceneManager.showDashboardAdminView();
+            } else {
+            sceneManager.showDashboardView();
+            }
         }catch(RuntimeException e){
     sceneManager.showAlertInfo("Error al iniciar sesion", "Verifique los campos", e.getMessage(), Alert.AlertType.WARNING);
 }

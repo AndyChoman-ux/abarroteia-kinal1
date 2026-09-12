@@ -67,5 +67,11 @@ public class AuthService {
 
     return authRepository.registrarUsuario(nuevoUsuario);
 }
+    public boolean asignarRolAdmin(String email) {
+    if (email == null || email.isBlank()) {
+        throw new IllegalArgumentException("Debe ingresar un correo");
+    }
+    return authRepository.actualizarRolPorEmail(email.trim(), 1);
+}
     
 }

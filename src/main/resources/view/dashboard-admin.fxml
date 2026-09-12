@@ -16,55 +16,61 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0" prefWidth="760.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardAdminController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1000.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardAdminController">
    <children>
-      <ImageView fitHeight="560.0" fitWidth="760.0" opacity="0.18" pickOnBounds="true">
+      <ImageView fitHeight="720.0" fitWidth="1000.0" opacity="0.18">
          <image>
             <Image url="@../img/login-background.png" />
          </image>
-         <StackPane.margin>
-            <Insets />
-         </StackPane.margin>
       </ImageView>
       <BorderPane styleClass="root-transparente">
          <top>
-            <VBox alignment="CENTER" scaleShape="false" spacing="12.0" styleClass="boton-redondo" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" spacing="12.0" BorderPane.alignment="CENTER">
                <padding>
                   <Insets bottom="14.0" left="20.0" right="20.0" top="18.0" />
                </padding>
                <children>
-                  <StackPane alignment="CENTER" prefHeight="58.0" prefWidth="760.0" styleClass="app-title">
+                  <StackPane alignment="CENTER">
                      <children>
-                        <Label styleClass="app-title" text="Abarroteria Kinal" />
-                        <ImageView fitHeight="113.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER_LEFT">
+                        <ImageView fitWidth="480.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/titulo-banner.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="103.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER_LEFT">
                            <image>
                               <Image url="@../img/login-logo.png" />
                            </image>
-                           <StackPane.margin>
-                              <Insets left="10.0" top="10.0" />
-                           </StackPane.margin>
                         </ImageView>
-                        <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;" StackPane.alignment="TOP_RIGHT">
-                           <graphic>
-                              <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../img/bell-icon.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="50.0" prefWidth="50.0" StackPane.alignment="TOP_RIGHT">
                            <StackPane.margin>
                               <Insets right="10.0" top="10.0" />
                            </StackPane.margin>
-                        </Button>
+                           <children>
+                              <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;">
+                                 <graphic>
+                                    <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/bell-icon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Label fx:id="lblBadgeNotificaciones" managed="false" text="0" visible="false" StackPane.alignment="TOP_RIGHT" style="-fx-background-color: #E53935; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 1 5 1 5;">
+                                 <StackPane.margin>
+                                    <Insets right="2.0" top="2.0" />
+                                 </StackPane.margin>
+                              </Label>
+                           </children>
+                        </StackPane>
                         <Button fx:id="btnHistorialVentas" mnemonicParsing="false" onAction="#handleVerHistorial" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #43A047; -fx-text-fill: white;" text="Historial de ventas " StackPane.alignment="TOP_RIGHT">
-   <font>
-      <Font name="Georgia" size="14.0" />
-   </font>
-   <StackPane.margin>
-      <Insets right="10.0" top="65.0" />
-   </StackPane.margin>
-</Button>
+                           <font>
+                              <Font name="Georgia" size="14.0" />
+                           </font>
+                           <StackPane.margin>
+                              <Insets right="10.0" top="65.0" />
+                           </StackPane.margin>
+                        </Button>
                      </children>
                   </StackPane>
                   <HBox alignment="CENTER_LEFT" maxWidth="440.0" styleClass="search-box">
@@ -72,9 +78,6 @@
                         <Label styleClass="search-icon" text="🔍" />
                         <TextField fx:id="txtBuscarProducto" promptText="Buscar producto" styleClass="search-field" HBox.hgrow="ALWAYS" />
                      </children>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
                   </HBox>
                </children>
             </VBox>
@@ -98,10 +101,11 @@
                   </TableView>
                   <HBox alignment="CENTER_RIGHT" spacing="10.0">
                      <children>
-                        <Button mnemonicParsing="false" prefHeight="35.0" prefWidth="129.0" styleClass="btn-secundario" text="Agregar " />
-                        <Button mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" styleClass="btn-secundario" text="Actualizar " />
+                        <Button fx:id="btnAgregarProducto" mnemonicParsing="false" onAction="#handleAgregarProducto" prefHeight="35.0" prefWidth="129.0" styleClass="btn-secundario" text="Agregar " />
+                        <Button fx:id="btnActualizarProducto" mnemonicParsing="false" onAction="#handleActualizarProducto" prefHeight="35.0" prefWidth="95.0" styleClass="btn-secundario" text="Actualizar " />
                         <Button fx:id="btnCerrarSesion" onAction="#handleCerrarSesion" prefHeight="35.0" prefWidth="113.0" styleClass="btn-secundario" text="Cerrar sesión" />
                         <Button fx:id="btnEliminarProducto" onAction="#handleEliminarProducto" prefHeight="35.0" prefWidth="90.0" styleClass="btn-secundario" text="Eliminar" />
+                        <Button fx:id="btnAsignarAdmin" onAction="#handleAsignarAdmin" prefHeight="35.0" prefWidth="130.0" styleClass="btn-secundario" text="Asignar admin" />
                      </children>
                   </HBox>
                </children>
@@ -141,17 +145,19 @@
                         </HBox>
                      </children>
                   </VBox>
+                  <VBox spacing="4.0">
+                     <children>
+                        <Label styleClass="label-gris" text="Método de pago" />
+                        <ComboBox fx:id="cbMetodoPago" maxWidth="1.7976931348623157E308" styleClass="campo" />
+                     </children>
+                  </VBox>
                   <ListView fx:id="listViewCarrito" styleClass="cart-list" VBox.vgrow="ALWAYS" />
                   <VBox spacing="6.0">
                      <children>
-                        <HBox alignment="CENTER_LEFT">
+                        <HBox alignment="CENTER_LEFT" styleClass="total-box">
                            <children>
-                              <Label styleClass="label-vender" text="  Total" textOverrun="WORD_ELLIPSIS" HBox.hgrow="ALWAYS">
-                                 <font>
-                                    <Font name="Baskerville Old Face" size="52.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="lblTotal" styleClass="label-total" text="                                 Q0.00" />
+                              <Label maxWidth="1.7976931348623157E308" styleClass="label-total-texto" text="Total" HBox.hgrow="ALWAYS" />
+                              <Label fx:id="lblTotal" styleClass="label-total" text="Q0.00" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">

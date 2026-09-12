@@ -1,5 +1,6 @@
 package main.java.com.vyorg.abarroteria.kinal.service;
 
+import java.math.BigDecimal;
 import javafx.collections.ObservableList;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 import main.java.com.vyorg.abarroteria.kinal.repository.ProductoRepository;
@@ -66,6 +67,49 @@ public class DashboardService {
                 notificacionService.crearNotificacionSiNoExiste("Stock bajo", mensaje,
                         producto.getIdProducto(), producto.getNombreProducto());
             }
+        }
+    }
+    public void agregarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio) {
+        if (idProducto == null || idProducto.isBlank()) {
+            throw new RuntimeException("El ID del producto no es válido");
+        }
+        if (nombreProducto == null || nombreProducto.isBlank()) {
+            throw new RuntimeException("El nombre del producto no puede estar vacío");
+        }
+        if (stock < 0) {
+            throw new RuntimeException("El stock no puede ser negativo");
+        }
+        if (precio == null || precio.compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("El precio debe ser un valor válido");
+        }
+
+        Producto nuevoProducto = new Producto(idProducto, nombreProducto, stock, precio);
+        boolean guardado = productoRepository.guardarProducto(nuevoProducto);
+
+        if (!guardado) {
+            throw new RuntimeException("No se pudo agregar el producto");
+        }
+    }
+
+    public void actualizarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio) {
+        if (idProducto == null || idProducto.isBlank()) {
+            throw new RuntimeException("Debe seleccionar un producto válido");
+        }
+        if (nombreProducto == null || nombreProducto.isBlank()) {
+            throw new RuntimeException("El nombre del producto no puede estar vacío");
+        }
+        if (stock < 0) {
+            throw new RuntimeException("El stock no puede ser negativo");
+        }
+        if (precio == null || precio.compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("El precio debe ser un valor válido");
+        }
+
+        Producto productoActualizado = new Producto(idProducto, nombreProducto, stock, precio);
+        boolean actualizado = productoRepository.actualizarProducto(productoActualizado);
+
+        if (!actualizado) {
+            throw new RuntimeException("No se pudo actualizar el producto");
         }
     }
 }
