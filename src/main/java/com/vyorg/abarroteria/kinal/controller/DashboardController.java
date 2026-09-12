@@ -4,8 +4,11 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -16,27 +19,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import main.java.com.vyorg.abarroteria.kinal.model.CarritoItem;
 import main.java.com.vyorg.abarroteria.kinal.model.DetalleVenta;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 import main.java.com.vyorg.abarroteria.kinal.service.DashboardService;
 import main.java.com.vyorg.abarroteria.kinal.service.HistorialVentasService;
 import main.java.com.vyorg.abarroteria.kinal.service.NotificacionService;
+import main.java.com.vyorg.abarroteria.kinal.util.FacturaPdfGenerator;
+import main.java.com.vyorg.abarroteria.kinal.util.ProductoCardFactory;
 import main.java.com.vyorg.abarroteria.kinal.util.SceneManager;
 import main.java.com.vyorg.abarroteria.kinal.util.SesionUsuario;
-import java.util.ArrayList;
-import java.util.List;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
-import main.java.com.vyorg.abarroteria.kinal.util.FacturaPdfGenerator;
-import javafx.scene.control.DialogPane;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 
 public class DashboardController implements Initializable {
 
@@ -46,17 +43,7 @@ public class DashboardController implements Initializable {
     @FXML
     private TextField txtBuscarProducto;
     @FXML
-    private TableView<Producto> tableProductos;
-    @FXML
-    private TableColumn<Producto, String> tableColumnIdProducto;
-    @FXML
-    private TableColumn<Producto, String> tableColumnNombre;
-    @FXML
-    private TableColumn<Producto, Integer> tableColumnStock;
-    @FXML
-    private TableColumn<Producto, BigDecimal> tableColumnPrecio;
-    @FXML
-    private Button btnEliminarProducto;
+    private FlowPane flowProductos;
     @FXML
     private Button btnCerrarSesion;
     @FXML
@@ -75,15 +62,11 @@ public class DashboardController implements Initializable {
     private Label lblTotal;
     @FXML
     private Label lblCantidadProductos;
-    @FXML
-    private Button btnAgregarCarrito;
-    @FXML
-    private Button btnCancelar;
-    @FXML
-    private Button btnComprar;
 
     private ObservableList<Producto> listaProductos;
     private FilteredList<Producto> productosFiltrados;
+    private Producto productoSeleccionado;
+    private VBox tarjetaSeleccionada;
     private final ObservableList<CarritoItem> carrito = FXCollections.observableArrayList();
     private final NotificacionService notificacionService = new NotificacionService();
     private final HistorialVentasService historialVentasService = new HistorialVentasService();
@@ -120,14 +103,9 @@ public class DashboardController implements Initializable {
     }
 
     private void handleLoadDataTableView() {
-        tableColumnIdProducto.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
-        tableColumnNombre.setCellValueFactory(new PropertyValueFactory<>("nombreProducto"));
-        tableColumnStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
-        tableColumnPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-
         listaProductos = dashboardService.findProducto();
         productosFiltrados = new FilteredList<>(listaProductos, p -> true);
-        tableProductos.setItems(productosFiltrados);
+        renderizarProductos();
     }
 
     private void filtrarProductos(String texto) {
@@ -144,20 +122,41 @@ public class DashboardController implements Initializable {
             return producto.getNombreProducto().toLowerCase().contains(filtro)
                     || producto.getIdProducto().toLowerCase().contains(filtro);
         });
+
+        renderizarProductos();
+    }
+
+    private void renderizarProductos() {
+        flowProductos.getChildren().clear();
+        productoSeleccionado = null;
+        tarjetaSeleccionada = null;
+
+        for (Producto producto : productosFiltrados) {
+            VBox tarjeta = ProductoCardFactory.crear(producto);
+            tarjeta.setOnMouseClicked(event -> seleccionarTarjeta(producto, tarjeta));
+            flowProductos.getChildren().add(tarjeta);
+        }
+    }
+
+    private void seleccionarTarjeta(Producto producto, VBox tarjeta) {
+        if (tarjetaSeleccionada != null) {
+            tarjetaSeleccionada.getStyleClass().remove("producto-card-seleccionada");
+        }
+        productoSeleccionado = producto;
+        tarjetaSeleccionada = tarjeta;
+        tarjeta.getStyleClass().add("producto-card-seleccionada");
     }
 
     @FXML
     private void handleEliminarProducto() {
-        Producto seleccionado = tableProductos.getSelectionModel().getSelectedItem();
-
-        if (seleccionado == null) {
+        if (productoSeleccionado == null) {
             sceneManager.showAlertInfo("Ningun producto seleccionado", "Seleccione un producto",
-                    "Debe seleccionar un producto de la tabla para poder eliminarlo", Alert.AlertType.WARNING);
+                    "Debe seleccionar un producto de la lista para poder eliminarlo", Alert.AlertType.WARNING);
             return;
         }
 
         boolean confirmado = sceneManager.showConfirmation(
-                "Eliminar " + seleccionado.getNombreProducto(),
+                "Eliminar " + productoSeleccionado.getNombreProducto(),
                 "Confirmar eliminacion",
                 "Esta accion no se puede deshacer. ¿Desea eliminar este producto?");
 
@@ -166,8 +165,9 @@ public class DashboardController implements Initializable {
         }
 
         try {
-            dashboardService.eliminarProducto(seleccionado.getIdProducto());
-            listaProductos.remove(seleccionado);
+            dashboardService.eliminarProducto(productoSeleccionado.getIdProducto());
+            handleLoadDataTableView();
+            filtrarProductos(txtBuscarProducto.getText());
             sceneManager.showAlertInfo("Producto eliminado", "Listo",
                     "El producto se elimino correctamente", Alert.AlertType.INFORMATION);
         } catch (RuntimeException e) {
@@ -224,28 +224,26 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void handleAgregarCarrito() {
-        Producto seleccionado = tableProductos.getSelectionModel().getSelectedItem();
-
-        if (seleccionado == null) {
+        if (productoSeleccionado == null) {
             sceneManager.showAlertInfo("Ningun producto seleccionado", "Seleccione un producto",
-                    "Debe seleccionar un producto de la tabla para agregarlo al carrito", Alert.AlertType.WARNING);
+                    "Debe seleccionar un producto de la lista para agregarlo al carrito", Alert.AlertType.WARNING);
             return;
         }
 
-        if (seleccionado.getStock() <= 0) {
+        if (productoSeleccionado.getStock() <= 0) {
             sceneManager.showAlertInfo("Sin stock", "Producto agotado",
-                    "El producto " + seleccionado.getNombreProducto() + " no tiene stock disponible",
+                    "El producto " + productoSeleccionado.getNombreProducto() + " no tiene stock disponible",
                     Alert.AlertType.WARNING);
             return;
         }
 
-       TextInputDialog dialog = new TextInputDialog("1");
-dialog.setTitle("Cantidad");
-dialog.setHeaderText("Agregar " + seleccionado.getNombreProducto() + " al carrito");
-dialog.setContentText("Cantidad:");
-sceneManager.estilizarDialogo(dialog);
+        TextInputDialog dialog = new TextInputDialog("1");
+        dialog.setTitle("Cantidad");
+        dialog.setHeaderText("Agregar " + productoSeleccionado.getNombreProducto() + " al carrito");
+        dialog.setContentText("Cantidad:");
+        sceneManager.estilizarDialogo(dialog);
 
-Optional<String> resultado = dialog.showAndWait();
+        Optional<String> resultado = dialog.showAndWait();
 
         if (resultado.isEmpty()) {
             return;
@@ -268,7 +266,7 @@ Optional<String> resultado = dialog.showAndWait();
 
         CarritoItem itemExistente = null;
         for (CarritoItem item : carrito) {
-            if (item.getProducto().getIdProducto().equals(seleccionado.getIdProducto())) {
+            if (item.getProducto().getIdProducto().equals(productoSeleccionado.getIdProducto())) {
                 itemExistente = item;
                 break;
             }
@@ -276,14 +274,14 @@ Optional<String> resultado = dialog.showAndWait();
 
         int cantidadEnCarrito = itemExistente == null ? 0 : itemExistente.getCantidad();
 
-        if (cantidadEnCarrito + cantidad > seleccionado.getStock()) {
+        if (cantidadEnCarrito + cantidad > productoSeleccionado.getStock()) {
             notificacionService.crearNotificacion("Stock insuficiente",
-                    "Solo hay " + seleccionado.getStock() + " unidades disponibles de " + seleccionado.getNombreProducto(),
-                    seleccionado.getIdProducto(), seleccionado.getNombreProducto());
+                    "Solo hay " + productoSeleccionado.getStock() + " unidades disponibles de " + productoSeleccionado.getNombreProducto(),
+                    productoSeleccionado.getIdProducto(), productoSeleccionado.getNombreProducto());
             actualizarBadgeNotificaciones();
             sceneManager.showAlertInfo("Stock insuficiente", "No hay suficiente stock",
-                    "Solo hay " + seleccionado.getStock() + " unidades disponibles de "
-                            + seleccionado.getNombreProducto(), Alert.AlertType.WARNING);
+                    "Solo hay " + productoSeleccionado.getStock() + " unidades disponibles de "
+                            + productoSeleccionado.getNombreProducto(), Alert.AlertType.WARNING);
             return;
         }
 
@@ -291,7 +289,7 @@ Optional<String> resultado = dialog.showAndWait();
             itemExistente.setCantidad(itemExistente.getCantidad() + cantidad);
             listViewCarrito.refresh();
         } else {
-            carrito.add(new CarritoItem(seleccionado, cantidad));
+            carrito.add(new CarritoItem(productoSeleccionado, cantidad));
         }
 
         actualizarResumenCarrito();
@@ -316,84 +314,83 @@ Optional<String> resultado = dialog.showAndWait();
         actualizarResumenCarrito();
     }
 
-
-   @FXML
-private void handleComprar() {
-    if (carrito.isEmpty()) {
-        sceneManager.showAlertInfo("Carrito vacio", "No hay productos",
-                "Agregue al menos un producto al carrito antes de comprar", Alert.AlertType.WARNING);
-        return;
-    }
-
-    BigDecimal total = calcularTotal();
-    String cliente = txtCliente.getText() == null || txtCliente.getText().isBlank()
-            ? "Publico en general" : txtCliente.getText();
-    String metodoPago = cbMetodoPago.getValue() == null ? "Efectivo" : cbMetodoPago.getValue();
-    String vendedor = SesionUsuario.getNombreUsuario();
-
-    boolean confirmado = sceneManager.showConfirmation(
-            "Confirmar venta",
-            "Total a cobrar: Q" + total.setScale(2, RoundingMode.HALF_UP),
-            "Cliente: " + cliente + "\n¿Desea confirmar la venta?");
-
-    if (!confirmado) {
-        return;
-    }
-
-    try {
-        for (CarritoItem item : carrito) {
-            dashboardService.descontarStock(item.getProducto().getIdProducto(), item.getCantidad());
+    @FXML
+    private void handleComprar() {
+        if (carrito.isEmpty()) {
+            sceneManager.showAlertInfo("Carrito vacio", "No hay productos",
+                    "Agregue al menos un producto al carrito antes de comprar", Alert.AlertType.WARNING);
+            return;
         }
-    } catch (RuntimeException e) {
-        sceneManager.showAlertInfo("Error en la venta", "No se pudo completar la compra",
-                e.getMessage(), Alert.AlertType.ERROR);
-        return;
-    }
 
-    int idVenta = historialVentasService.registrarVenta(cliente, total.doubleValue(), metodoPago, vendedor);
+        BigDecimal total = calcularTotal();
+        String cliente = txtCliente.getText() == null || txtCliente.getText().isBlank()
+                ? "Publico en general" : txtCliente.getText();
+        String metodoPago = cbMetodoPago.getValue() == null ? "Efectivo" : cbMetodoPago.getValue();
+        String vendedor = SesionUsuario.getNombreUsuario();
 
-    List<CarritoItem> carritoVenta = new ArrayList<>(carrito);
+        boolean confirmado = sceneManager.showConfirmation(
+                "Confirmar venta",
+                "Total a cobrar: Q" + total.setScale(2, RoundingMode.HALF_UP),
+                "Cliente: " + cliente + "\n¿Desea confirmar la venta?");
 
-    List<DetalleVenta> detalles = new ArrayList<>();
-    for (CarritoItem item : carritoVenta) {
-        detalles.add(new DetalleVenta(
-                item.getProducto().getIdProducto(),
-                item.getProducto().getNombreProducto(),
-                item.getCantidad(),
-                item.getProducto().getPrecio().doubleValue(),
-                item.getSubtotal().doubleValue()
-        ));
-    }
-    historialVentasService.registrarDetalleVenta(idVenta, detalles);
+        if (!confirmado) {
+            return;
+        }
 
-    Alert generando = new Alert(Alert.AlertType.INFORMATION);
-    generando.setTitle("Procesando venta");
-    generando.setHeaderText(null);
-    generando.setContentText("Generando factura...");
-    generando.show();
-
-    PauseTransition espera = new PauseTransition(Duration.seconds(3));
-    espera.setOnFinished(event -> {
-        generando.close();
         try {
-            File factura = FacturaPdfGenerator.generar(idVenta, cliente, carritoVenta, total);
-            historialVentasService.actualizarFactura(idVenta, factura.getAbsolutePath());
-            sceneManager.showAlertInfo("Venta realizada", "Compra exitosa",
-                    "Se vendio un total de Q" + total.setScale(2, RoundingMode.HALF_UP)
-                            + "\nSe genero la factura en PDF.", Alert.AlertType.INFORMATION);
-        } catch (Exception e) {
-            sceneManager.showAlertInfo("Error al generar factura", "No se pudo crear el PDF",
+            for (CarritoItem item : carrito) {
+                dashboardService.descontarStock(item.getProducto().getIdProducto(), item.getCantidad());
+            }
+        } catch (RuntimeException e) {
+            sceneManager.showAlertInfo("Error en la venta", "No se pudo completar la compra",
                     e.getMessage(), Alert.AlertType.ERROR);
+            return;
         }
-    });
-    espera.play();
 
-    carrito.clear();
-    actualizarResumenCarrito();
-    handleLoadDataTableView();
-    filtrarProductos(txtBuscarProducto.getText());
-    actualizarBadgeNotificaciones();
-}
+        int idVenta = historialVentasService.registrarVenta(cliente, total.doubleValue(), metodoPago, vendedor);
+
+        List<CarritoItem> carritoVenta = new ArrayList<>(carrito);
+
+        List<DetalleVenta> detalles = new ArrayList<>();
+        for (CarritoItem item : carritoVenta) {
+            detalles.add(new DetalleVenta(
+                    item.getProducto().getIdProducto(),
+                    item.getProducto().getNombreProducto(),
+                    item.getCantidad(),
+                    item.getProducto().getPrecio().doubleValue(),
+                    item.getSubtotal().doubleValue()
+            ));
+        }
+        historialVentasService.registrarDetalleVenta(idVenta, detalles);
+
+        Alert generando = new Alert(Alert.AlertType.INFORMATION);
+        generando.setTitle("Procesando venta");
+        generando.setHeaderText(null);
+        generando.setContentText("Generando factura...");
+        generando.show();
+
+        PauseTransition espera = new PauseTransition(Duration.seconds(3));
+        espera.setOnFinished(event -> {
+            generando.close();
+            try {
+                File factura = FacturaPdfGenerator.generar(idVenta, cliente, carritoVenta, total);
+                historialVentasService.actualizarFactura(idVenta, factura.getAbsolutePath());
+                sceneManager.showAlertInfo("Venta realizada", "Compra exitosa",
+                        "Se vendio un total de Q" + total.setScale(2, RoundingMode.HALF_UP)
+                                + "\nSe genero la factura en PDF.", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                sceneManager.showAlertInfo("Error al generar factura", "No se pudo crear el PDF",
+                        e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+        espera.play();
+
+        carrito.clear();
+        actualizarResumenCarrito();
+        handleLoadDataTableView();
+        filtrarProductos(txtBuscarProducto.getText());
+        actualizarBadgeNotificaciones();
+    }
 
     private void handleQuitarDelCarrito() {
         CarritoItem seleccionado = listViewCarrito.getSelectionModel().getSelectedItem();

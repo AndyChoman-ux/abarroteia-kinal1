@@ -8,9 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javafx.collections.FXCollections;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Connection;
-
-
 
 public class ProductoRepository {
 
@@ -24,7 +21,8 @@ public class ProductoRepository {
                         rs.getString("id_producto"),
                         rs.getString("nombre_producto"),
                         rs.getInt("stock"),
-                        rs.getBigDecimal("precio")
+                        rs.getBigDecimal("precio"),
+                        rs.getString("ruta_imagen")
                 ));
             }
             return lista;
@@ -58,37 +56,36 @@ public class ProductoRepository {
             throw new RuntimeException("Error al actualizar el stock: " + e.getMessage());
         }
     }
-public boolean guardarProducto(Producto producto) {
-        String sql = "INSERT INTO productos (id_producto, nombre_producto, stock, precio) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DataBaseConnection.getDataBaseConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            
-            preparedStatement.setString(1, producto.getIdProducto());
-            preparedStatement.setString(2, producto.getNombreProducto());
-            preparedStatement.setInt(3, producto.getStock());
-            preparedStatement.setBigDecimal(4, producto.getPrecio());
-            
-            return preparedStatement.executeUpdate() > 0;
+
+    public boolean agregarProducto(Producto producto) {
+        String sql = "insert into productos (id_producto, nombre_producto, stock, precio, ruta_imagen) values (?, ?, ?, ?, ?)";
+        try (PreparedStatement pstm = DataBaseConnection.getDataBaseConnection().prepareStatement(sql)) {
+            pstm.setString(1, producto.getIdProducto());
+            pstm.setString(2, producto.getNombreProducto());
+            pstm.setInt(3, producto.getStock());
+            pstm.setBigDecimal(4, producto.getPrecio());
+            pstm.setString(5, producto.getRutaImagen());
+            int filasAfectadas = pstm.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new RuntimeException("Ya existe un producto con ese ID");
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("Error al agregar el producto: " + e.getMessage());
         }
     }
 
     public boolean actualizarProducto(Producto producto) {
-        String sql = "UPDATE productos SET nombre_producto = ?, stock = ?, precio = ? WHERE id_producto = ?";
-        try (Connection connection = DataBaseConnection.getDataBaseConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            
-            preparedStatement.setString(1, producto.getNombreProducto());
-            preparedStatement.setInt(2, producto.getStock());
-            preparedStatement.setBigDecimal(3, producto.getPrecio());
-            preparedStatement.setString(4, producto.getIdProducto());
-            
-            return preparedStatement.executeUpdate() > 0;
+        String sql = "update productos set nombre_producto = ?, stock = ?, precio = ?, ruta_imagen = ? where id_producto = ?";
+        try (PreparedStatement pstm = DataBaseConnection.getDataBaseConnection().prepareStatement(sql)) {
+            pstm.setString(1, producto.getNombreProducto());
+            pstm.setInt(2, producto.getStock());
+            pstm.setBigDecimal(3, producto.getPrecio());
+            pstm.setString(4, producto.getRutaImagen());
+            pstm.setString(5, producto.getIdProducto());
+            int filasAfectadas = pstm.executeUpdate();
+            return filasAfectadas > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("Error al actualizar el producto: " + e.getMessage());
         }
     }
 }

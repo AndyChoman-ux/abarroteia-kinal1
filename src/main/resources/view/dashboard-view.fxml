@@ -5,12 +5,12 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -88,17 +88,15 @@
                   <Insets bottom="16.0" left="20.0" right="10.0" />
                </padding>
                <children>
-                  <TableView fx:id="tableProductos" styleClass="card" VBox.vgrow="ALWAYS">
-                     <columns>
-                        <TableColumn fx:id="tableColumnIdProducto" prefWidth="90.0" text="ID" />
-                        <TableColumn fx:id="tableColumnNombre" prefWidth="170.0" text="Nombre" />
-                        <TableColumn fx:id="tableColumnPrecio" prefWidth="100.0" text="Precio" />
-                        <TableColumn fx:id="tableColumnStock" prefWidth="100.0" text="Stock" />
-                     </columns>
-                     <placeholder>
-                        <Label styleClass="placeholder-label" text="Tabla sin contenido" />
-                     </placeholder>
-                  </TableView>
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="productos-scroll" VBox.vgrow="ALWAYS">
+                     <content>
+                        <FlowPane fx:id="flowProductos" hgap="14.0" vgap="14.0" styleClass="productos-grid">
+                           <padding>
+                              <Insets bottom="10.0" left="4.0" right="4.0" top="4.0" />
+                           </padding>
+                        </FlowPane>
+                     </content>
+                  </ScrollPane>
                   <HBox alignment="CENTER_RIGHT" spacing="10.0">
                      <children>
                         <Button fx:id="btnCerrarSesion" onAction="#handleCerrarSesion" prefHeight="35.0" prefWidth="166.0" styleClass="btn-secundario" text="Cerrar sesión" />
@@ -142,11 +140,11 @@
                      </children>
                   </VBox>
                   <VBox spacing="4.0">
-   <children>
-      <Label styleClass="label-gris" text="Método de pago" />
-      <ComboBox fx:id="cbMetodoPago" maxWidth="1.7976931348623157E308" styleClass="campo" />
-   </children>
-</VBox>
+                     <children>
+                        <Label styleClass="label-gris" text="Método de pago" />
+                        <ComboBox fx:id="cbMetodoPago" maxWidth="1.7976931348623157E308" styleClass="campo" />
+                     </children>
+                  </VBox>
                   <ListView fx:id="listViewCarrito" styleClass="cart-list" VBox.vgrow="ALWAYS" />
                   <VBox spacing="6.0">
                      <children>

@@ -1,14 +1,13 @@
 package main.java.com.vyorg.abarroteria.kinal.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -16,21 +15,24 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.util.Duration;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import main.java.com.vyorg.abarroteria.kinal.model.CarritoItem;
 import main.java.com.vyorg.abarroteria.kinal.model.DetalleVenta;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
@@ -39,8 +41,14 @@ import main.java.com.vyorg.abarroteria.kinal.service.DashboardService;
 import main.java.com.vyorg.abarroteria.kinal.service.HistorialVentasService;
 import main.java.com.vyorg.abarroteria.kinal.service.NotificacionService;
 import main.java.com.vyorg.abarroteria.kinal.util.FacturaPdfGenerator;
+import main.java.com.vyorg.abarroteria.kinal.util.ProductoCardFactory;
 import main.java.com.vyorg.abarroteria.kinal.util.SceneManager;
 import main.java.com.vyorg.abarroteria.kinal.util.SesionUsuario;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DashboardAdminController implements Initializable {
 
@@ -53,15 +61,7 @@ public class DashboardAdminController implements Initializable {
     @FXML
     private TextField txtBuscarProducto;
     @FXML
-    private TableView<Producto> tableProductos;
-    @FXML
-    private TableColumn<Producto, String> tableColumnIdProducto;
-    @FXML
-    private TableColumn<Producto, String> tableColumnNombre;
-    @FXML
-    private TableColumn<Producto, Integer> tableColumnStock;
-    @FXML
-    private TableColumn<Producto, BigDecimal> tableColumnPrecio;
+    private FlowPane flowProductos;
     @FXML
     private Label lblBadgeNotificaciones;
     @FXML
@@ -81,6 +81,8 @@ public class DashboardAdminController implements Initializable {
 
     private ObservableList<Producto> listaProductos;
     private FilteredList<Producto> productosFiltrados;
+    private Producto productoSeleccionado;
+    private VBox tarjetaSeleccionada;
     private final ObservableList<CarritoItem> carrito = FXCollections.observableArrayList();
 
     public DashboardAdminController(AuthService authService, DashboardService dashboardService, SceneManager sceneManager) {
@@ -116,14 +118,9 @@ public class DashboardAdminController implements Initializable {
     }
 
     private void handleLoadDataTableView() {
-        tableColumnIdProducto.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
-        tableColumnNombre.setCellValueFactory(new PropertyValueFactory<>("nombreProducto"));
-        tableColumnStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
-        tableColumnPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-
         listaProductos = dashboardService.findProducto();
         productosFiltrados = new FilteredList<>(listaProductos, p -> true);
-        tableProductos.setItems(productosFiltrados);
+        renderizarProductos();
     }
 
     private void filtrarProductos(String texto) {
@@ -138,6 +135,28 @@ public class DashboardAdminController implements Initializable {
             return producto.getNombreProducto().toLowerCase().contains(filtro)
                     || producto.getIdProducto().toLowerCase().contains(filtro);
         });
+        renderizarProductos();
+    }
+
+    private void renderizarProductos() {
+        flowProductos.getChildren().clear();
+        productoSeleccionado = null;
+        tarjetaSeleccionada = null;
+
+        for (Producto producto : productosFiltrados) {
+            VBox tarjeta = ProductoCardFactory.crear(producto);
+            tarjeta.setOnMouseClicked(event -> seleccionarTarjeta(producto, tarjeta));
+            flowProductos.getChildren().add(tarjeta);
+        }
+    }
+
+    private void seleccionarTarjeta(Producto producto, VBox tarjeta) {
+        if (tarjetaSeleccionada != null) {
+            tarjetaSeleccionada.getStyleClass().remove("producto-card-seleccionada");
+        }
+        productoSeleccionado = producto;
+        tarjetaSeleccionada = tarjeta;
+        tarjeta.getStyleClass().add("producto-card-seleccionada");
     }
 
     private void actualizarBadgeNotificaciones() {
@@ -212,7 +231,7 @@ public class DashboardAdminController implements Initializable {
         resultado.ifPresent(producto -> {
             try {
                 dashboardService.agregarProducto(producto.getIdProducto(), producto.getNombreProducto(),
-                        producto.getStock(), producto.getPrecio());
+                        producto.getStock(), producto.getPrecio(), producto.getRutaImagen());
                 handleLoadDataTableView();
                 filtrarProductos(txtBuscarProducto.getText());
                 sceneManager.showAlertInfo("Producto agregado", "Listo",
@@ -226,19 +245,17 @@ public class DashboardAdminController implements Initializable {
 
     @FXML
     private void handleActualizarProducto() {
-        Producto seleccionado = tableProductos.getSelectionModel().getSelectedItem();
-
-        if (seleccionado == null) {
+        if (productoSeleccionado == null) {
             sceneManager.showAlertInfo("Ningun producto seleccionado", "Seleccione un producto",
-                    "Debe seleccionar un producto de la tabla para poder actualizarlo", Alert.AlertType.WARNING);
+                    "Debe seleccionar un producto de la lista para poder actualizarlo", Alert.AlertType.WARNING);
             return;
         }
 
-        Optional<Producto> resultado = mostrarDialogoProducto("Actualizar producto", seleccionado);
+        Optional<Producto> resultado = mostrarDialogoProducto("Actualizar producto", productoSeleccionado);
         resultado.ifPresent(producto -> {
             try {
                 dashboardService.actualizarProducto(producto.getIdProducto(), producto.getNombreProducto(),
-                        producto.getStock(), producto.getPrecio());
+                        producto.getStock(), producto.getPrecio(), producto.getRutaImagen());
                 handleLoadDataTableView();
                 filtrarProductos(txtBuscarProducto.getText());
                 sceneManager.showAlertInfo("Producto actualizado", "Listo",
@@ -252,16 +269,14 @@ public class DashboardAdminController implements Initializable {
 
     @FXML
     private void handleEliminarProducto() {
-        Producto seleccionado = tableProductos.getSelectionModel().getSelectedItem();
-
-        if (seleccionado == null) {
+        if (productoSeleccionado == null) {
             sceneManager.showAlertInfo("Ningun producto seleccionado", "Seleccione un producto",
-                    "Debe seleccionar un producto de la tabla para poder eliminarlo", Alert.AlertType.WARNING);
+                    "Debe seleccionar un producto de la lista para poder eliminarlo", Alert.AlertType.WARNING);
             return;
         }
 
         boolean confirmado = sceneManager.showConfirmation(
-                "Eliminar " + seleccionado.getNombreProducto(),
+                "Eliminar " + productoSeleccionado.getNombreProducto(),
                 "Confirmar eliminacion",
                 "Esta accion no se puede deshacer. ¿Desea eliminar este producto?");
 
@@ -270,8 +285,9 @@ public class DashboardAdminController implements Initializable {
         }
 
         try {
-            dashboardService.eliminarProducto(seleccionado.getIdProducto());
-            listaProductos.remove(seleccionado);
+            dashboardService.eliminarProducto(productoSeleccionado.getIdProducto());
+            handleLoadDataTableView();
+            filtrarProductos(txtBuscarProducto.getText());
             sceneManager.showAlertInfo("Producto eliminado", "Listo",
                     "El producto se elimino correctamente", Alert.AlertType.INFORMATION);
         } catch (RuntimeException e) {
@@ -304,13 +320,38 @@ public class DashboardAdminController implements Initializable {
         TextField txtPrecio = new TextField();
         txtPrecio.setPromptText("Precio");
 
+        ImageView previewImagen = new ImageView();
+        previewImagen.setFitWidth(80.0);
+        previewImagen.setFitHeight(80.0);
+        previewImagen.setPreserveRatio(true);
+        Button btnSeleccionarImagen = new Button("Seleccionar imagen");
+
+        String[] rutaImagenSeleccionada = { null };
+
         if (productoExistente != null) {
             txtId.setText(productoExistente.getIdProducto());
             txtId.setDisable(true);
             txtNombre.setText(productoExistente.getNombreProducto());
             txtStock.setText(String.valueOf(productoExistente.getStock()));
             txtPrecio.setText(productoExistente.getPrecio().toPlainString());
+            rutaImagenSeleccionada[0] = productoExistente.getRutaImagen();
         }
+        previewImagen.setImage(ProductoCardFactory.cargarImagen(rutaImagenSeleccionada[0]));
+
+        btnSeleccionarImagen.setOnAction(e -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Seleccionar imagen del producto");
+            chooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Imagenes", "*.png", "*.jpg", "*.jpeg"));
+            File archivo = chooser.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
+            if (archivo != null) {
+                rutaImagenSeleccionada[0] = archivo.getAbsolutePath();
+                previewImagen.setImage(new Image(archivo.toURI().toString(), 80, 80, true, true));
+            }
+        });
+
+        VBox columnaImagen = new VBox(8.0, previewImagen, btnSeleccionarImagen);
+        columnaImagen.setAlignment(Pos.CENTER);
 
         grid.add(new Label("ID:"), 0, 0);
         grid.add(txtId, 1, 0);
@@ -320,6 +361,8 @@ public class DashboardAdminController implements Initializable {
         grid.add(txtStock, 1, 2);
         grid.add(new Label("Precio:"), 0, 3);
         grid.add(txtPrecio, 1, 3);
+        grid.add(new Label("Imagen:"), 0, 4);
+        grid.add(columnaImagen, 1, 4);
 
         dialog.getDialogPane().setContent(grid);
         sceneManager.estilizarDialogo(dialog);
@@ -333,7 +376,8 @@ public class DashboardAdminController implements Initializable {
                 String nombre = txtNombre.getText() == null ? "" : txtNombre.getText().trim();
                 int stock = Integer.parseInt(txtStock.getText().trim());
                 BigDecimal precio = new BigDecimal(txtPrecio.getText().trim());
-                return new Producto(id, nombre, stock, precio);
+                String rutaFinal = guardarImagenSiEsNueva(id, rutaImagenSeleccionada[0]);
+                return new Producto(id, nombre, stock, precio, rutaFinal);
             } catch (NumberFormatException e) {
                 sceneManager.showAlertInfo("Datos invalidos", "Revise los datos",
                         "Stock y precio deben ser numeros validos", Alert.AlertType.ERROR);
@@ -344,26 +388,52 @@ public class DashboardAdminController implements Initializable {
         return dialog.showAndWait();
     }
 
+    private String guardarImagenSiEsNueva(String idProducto, String rutaSeleccionada) {
+        if (rutaSeleccionada == null || rutaSeleccionada.isBlank()) {
+            return null;
+        }
+
+        File origen = new File(rutaSeleccionada);
+        File carpetaDestino = new File(System.getProperty("user.home"), "Imagenes_Productos_Kinal");
+        if (!carpetaDestino.exists()) {
+            carpetaDestino.mkdirs();
+        }
+
+        String extension = origen.getName().contains(".")
+                ? origen.getName().substring(origen.getName().lastIndexOf('.'))
+                : ".png";
+        File destino = new File(carpetaDestino, idProducto + extension);
+
+        if (origen.getAbsolutePath().equals(destino.getAbsolutePath())) {
+            return destino.getAbsolutePath();
+        }
+
+        try {
+            Files.copy(origen.toPath(), destino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return destino.getAbsolutePath();
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo guardar la imagen del producto");
+        }
+    }
+
     @FXML
     private void handleAgregarCarrito() {
-        Producto seleccionado = tableProductos.getSelectionModel().getSelectedItem();
-
-        if (seleccionado == null) {
+        if (productoSeleccionado == null) {
             sceneManager.showAlertInfo("Ningun producto seleccionado", "Seleccione un producto",
-                    "Debe seleccionar un producto de la tabla para agregarlo al carrito", Alert.AlertType.WARNING);
+                    "Debe seleccionar un producto de la lista para agregarlo al carrito", Alert.AlertType.WARNING);
             return;
         }
 
-        if (seleccionado.getStock() <= 0) {
+        if (productoSeleccionado.getStock() <= 0) {
             sceneManager.showAlertInfo("Sin stock", "Producto agotado",
-                    "El producto " + seleccionado.getNombreProducto() + " no tiene stock disponible",
+                    "El producto " + productoSeleccionado.getNombreProducto() + " no tiene stock disponible",
                     Alert.AlertType.WARNING);
             return;
         }
 
         TextInputDialog dialog = new TextInputDialog("1");
         dialog.setTitle("Cantidad");
-        dialog.setHeaderText("Agregar " + seleccionado.getNombreProducto() + " al carrito");
+        dialog.setHeaderText("Agregar " + productoSeleccionado.getNombreProducto() + " al carrito");
         dialog.setContentText("Cantidad:");
         sceneManager.estilizarDialogo(dialog);
 
@@ -390,7 +460,7 @@ public class DashboardAdminController implements Initializable {
 
         CarritoItem itemExistente = null;
         for (CarritoItem item : carrito) {
-            if (item.getProducto().getIdProducto().equals(seleccionado.getIdProducto())) {
+            if (item.getProducto().getIdProducto().equals(productoSeleccionado.getIdProducto())) {
                 itemExistente = item;
                 break;
             }
@@ -398,14 +468,14 @@ public class DashboardAdminController implements Initializable {
 
         int cantidadEnCarrito = itemExistente == null ? 0 : itemExistente.getCantidad();
 
-        if (cantidadEnCarrito + cantidad > seleccionado.getStock()) {
+        if (cantidadEnCarrito + cantidad > productoSeleccionado.getStock()) {
             notificacionService.crearNotificacion("Stock insuficiente",
-                    "Solo hay " + seleccionado.getStock() + " unidades disponibles de " + seleccionado.getNombreProducto(),
-                    seleccionado.getIdProducto(), seleccionado.getNombreProducto());
+                    "Solo hay " + productoSeleccionado.getStock() + " unidades disponibles de " + productoSeleccionado.getNombreProducto(),
+                    productoSeleccionado.getIdProducto(), productoSeleccionado.getNombreProducto());
             actualizarBadgeNotificaciones();
             sceneManager.showAlertInfo("Stock insuficiente", "No hay suficiente stock",
-                    "Solo hay " + seleccionado.getStock() + " unidades disponibles de "
-                            + seleccionado.getNombreProducto(), Alert.AlertType.WARNING);
+                    "Solo hay " + productoSeleccionado.getStock() + " unidades disponibles de "
+                            + productoSeleccionado.getNombreProducto(), Alert.AlertType.WARNING);
             return;
         }
 
@@ -413,7 +483,7 @@ public class DashboardAdminController implements Initializable {
             itemExistente.setCantidad(itemExistente.getCantidad() + cantidad);
             listViewCarrito.refresh();
         } else {
-            carrito.add(new CarritoItem(seleccionado, cantidad));
+            carrito.add(new CarritoItem(productoSeleccionado, cantidad));
         }
 
         actualizarResumenCarrito();
