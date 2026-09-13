@@ -38,6 +38,10 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import main.java.com.vyorg.abarroteria.kinal.controller.DashboardAdminController;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.scene.layout.StackPane;
 
 public class SceneManager {
 
@@ -49,6 +53,59 @@ public class SceneManager {
     }
 
     public SceneManager() {
+    }
+        public void showSplashScreen() {
+        Stage splashStage = new Stage();
+        splashStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+        ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/main/resources/img/login-logo.png")));
+        logo.setFitWidth(140.0);
+        logo.setFitHeight(140.0);
+        logo.setPreserveRatio(true);
+
+        Label lblTitulo = new Label("Abarroteria Kinal");
+        lblTitulo.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2E7D32;");
+
+        Label lblSubtitulo = new Label("¡Su despensa de confianza desde 1995!");
+        lblSubtitulo.setStyle("-fx-font-size: 13px; -fx-text-fill: #757575;");
+
+        VBox contenido = new VBox(12.0, logo, lblTitulo, lblSubtitulo);
+        contenido.setAlignment(Pos.CENTER);
+
+        StackPane root = new StackPane(contenido);
+        root.setStyle("-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1;");
+        root.setPrefSize(480.0, 320.0);
+
+        Scene splashScene = new Scene(root, 480.0, 320.0);
+        splashStage.setScene(splashScene);
+        splashStage.centerOnScreen();
+        splashStage.show();
+
+        root.setOpacity(0.0);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.6), root);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+
+        PauseTransition espera = new PauseTransition(Duration.seconds(1.4));
+
+        FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), root);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+
+        fadeOut.setOnFinished(event -> {
+            splashStage.close();
+            try {
+                showLoginView();
+                stage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        fadeIn.setOnFinished(event -> espera.play());
+        espera.setOnFinished(event -> fadeOut.play());
+        fadeIn.play();
     }
 
     public void showLoginView() throws Exception {
