@@ -42,6 +42,7 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 import javafx.scene.layout.StackPane;
+import main.java.com.vyorg.abarroteria.kinal.controller.HistorialInventarioController;
 
 public class SceneManager {
 
@@ -351,6 +352,24 @@ public class SceneManager {
 
             stage.setScene(new Scene(root));
             stage.setTitle("Historial de Ventas - Abarrotería Kinal");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+       public void showHistorialInventario() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/historial-inventario-view.fxml"));
+
+            Parent root = loader.load();
+
+            HistorialInventarioController controller = loader.getController();
+            if (controller != null) {
+                controller.setSceneManager(this);
+            }
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("Historial de Inventario - Abarrotería Kinal");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();

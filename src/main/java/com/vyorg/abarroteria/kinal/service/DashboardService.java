@@ -1,7 +1,10 @@
 package main.java.com.vyorg.abarroteria.kinal.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 import javafx.collections.ObservableList;
+import main.java.com.vyorg.abarroteria.kinal.model.MovimientoInventario;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 import main.java.com.vyorg.abarroteria.kinal.repository.ProductoRepository;
 
@@ -11,6 +14,7 @@ public class DashboardService {
 
     private final ProductoRepository productoRepository;
     private final NotificacionService notificacionService;
+    private final MovimientoInventarioService movimientoInventarioService;
 
     public DashboardService(ProductoRepository productoRepository) {
         this(productoRepository, new NotificacionService());
@@ -19,6 +23,7 @@ public class DashboardService {
     public DashboardService(ProductoRepository productoRepository, NotificacionService notificacionService) {
         this.productoRepository = productoRepository;
         this.notificacionService = notificacionService;
+        this.movimientoInventarioService = new MovimientoInventarioService();
     }
 
     public ObservableList<Producto> findProducto() {
@@ -37,11 +42,16 @@ public class DashboardService {
             throw new RuntimeException("Debe seleccionar un producto valido");
         }
 
+        Producto productoAEliminar = buscarPorId(idProducto);
+
         boolean eliminado = productoRepository.eliminarProducto(idProducto);
 
         if (!eliminado) {
             throw new RuntimeException("No se pudo eliminar el producto");
         }
+
+        String nombre = productoAEliminar == null ? idProducto : productoAEliminar.getNombreProducto();
+        movimientoInventarioService.registrarMovimiento(idProducto, nombre, "ELIMINACION", "Producto eliminado del catalogo");
     }
 
     public void descontarStock(String idProducto, int cantidad) {
@@ -59,17 +69,7 @@ public class DashboardService {
         }
     }
 
-    private void verificarStockBajo(ObservableList<Producto> productos) {
-        for (Producto producto : productos) {
-            if (producto.getStock() <= STOCK_MINIMO) {
-                String mensaje = "El producto " + producto.getNombreProducto()
-                        + " tiene stock bajo: quedan " + producto.getStock() + " unidades";
-                notificacionService.crearNotificacionSiNoExiste("Stock bajo", mensaje,
-                        producto.getIdProducto(), producto.getNombreProducto());
-            }
-        }
-    }
-            public void agregarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen, String categoria) {
+    public void agregarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen, String categoria) {
         if (idProducto == null || idProducto.isBlank()) {
             throw new RuntimeException("Debe ingresar un ID de producto");
         }
@@ -87,6 +87,9 @@ public class DashboardService {
         if (!agregado) {
             throw new RuntimeException("No se pudo agregar el producto");
         }
+
+        movimientoInventarioService.registrarMovimiento(idProducto, nombreProducto, "ALTA",
+                "Stock inicial: " + stock + ", Precio: Q" + precio.setScale(2, RoundingMode.HALF_UP));
     }
 
     public void actualizarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen, String categoria) {
@@ -107,5 +110,32 @@ public class DashboardService {
         if (!actualizado) {
             throw new RuntimeException("No se pudo actualizar el producto");
         }
+
+        movimientoInventarioService.registrarMovimiento(idProducto, nombreProducto, "MODIFICACION",
+                "Nuevo stock: " + stock + ", Nuevo precio: Q" + precio.setScale(2, RoundingMode.HALF_UP));
     }
-  } 
+
+    public List<MovimientoInventario> obtenerMovimientos() {
+        return movimientoInventarioService.listarMovimientos();
+    }
+
+    private Producto buscarPorId(String idProducto) {
+        for (Producto producto : productoRepository.findAll()) {
+            if (producto.getIdProducto().equals(idProducto)) {
+                return producto;
+            }
+        }
+        return null;
+    }
+
+    private void verificarStockBajo(ObservableList<Producto> productos) {
+        for (Producto producto : productos) {
+            if (producto.getStock() <= STOCK_MINIMO) {
+                String mensaje = "El producto " + producto.getNombreProducto()
+                        + " tiene stock bajo: quedan " + producto.getStock() + " unidades";
+                notificacionService.crearNotificacionSiNoExiste("Stock bajo", mensaje,
+                        producto.getIdProducto(), producto.getNombreProducto());
+            }
+        }
+    }
+}
