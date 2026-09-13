@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -25,6 +28,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+
 import main.java.com.vyorg.abarroteria.kinal.model.CarritoItem;
 import main.java.com.vyorg.abarroteria.kinal.model.DetalleVenta;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
@@ -68,6 +72,8 @@ public class DashboardController implements Initializable {
     @FXML
     private Label lblCantidadProductos;
 
+    private Timeline timelineNotificaciones;
+
     private ObservableList<Producto> listaProductos;
     private FilteredList<Producto> productosFiltrados;
     private Producto productoSeleccionado;
@@ -107,6 +113,10 @@ public class DashboardController implements Initializable {
         actualizarResumenCarrito();
         actualizarBadgeNotificaciones();
         lblBienvenida.setText("Bienvenido, " + SesionUsuario.getNombreUsuario());
+
+        timelineNotificaciones = new Timeline(new KeyFrame(Duration.seconds(15), event -> actualizarBadgeNotificaciones()));
+        timelineNotificaciones.setCycleCount(Timeline.INDEFINITE);
+        timelineNotificaciones.play();
     }
 
     private void handleLoadDataTableView() {
@@ -221,6 +231,7 @@ public class DashboardController implements Initializable {
         }
 
         try {
+            timelineNotificaciones.stop();
             SesionUsuario.cerrarSesion();
             sceneManager.showLoginView();
         } catch (Exception e) {
@@ -249,6 +260,7 @@ public class DashboardController implements Initializable {
     @FXML
     private void handleVerHistorial() {
         try {
+            timelineNotificaciones.stop();
             sceneManager.showHistorialVentas();
         } catch (Exception e) {
             sceneManager.showAlertInfo("Error", "No se pudo abrir el historial", e.getMessage(), Alert.AlertType.ERROR);

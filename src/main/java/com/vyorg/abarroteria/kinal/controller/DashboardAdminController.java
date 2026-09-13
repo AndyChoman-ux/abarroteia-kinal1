@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -58,6 +60,8 @@ public class DashboardAdminController implements Initializable {
     private final SceneManager sceneManager;
     private final NotificacionService notificacionService = new NotificacionService();
     private final HistorialVentasService historialVentasService = new HistorialVentasService();
+
+    private Timeline timelineNotificaciones;
 
     @FXML
     private TextField txtBuscarProducto;
@@ -122,6 +126,10 @@ public class DashboardAdminController implements Initializable {
         actualizarResumenCarrito();
         actualizarBadgeNotificaciones();
         lblBienvenida.setText("Bienvenido, " + SesionUsuario.getNombreUsuario());
+
+        timelineNotificaciones = new Timeline(new KeyFrame(Duration.seconds(15), event -> actualizarBadgeNotificaciones()));
+        timelineNotificaciones.setCycleCount(Timeline.INDEFINITE);
+        timelineNotificaciones.play();
     }
 
     private void handleLoadDataTableView() {
@@ -215,6 +223,7 @@ public class DashboardAdminController implements Initializable {
     @FXML
     private void handleVerHistorial() {
         try {
+            timelineNotificaciones.stop();
             sceneManager.showHistorialVentas();
         } catch (Exception e) {
             sceneManager.showAlertInfo("Error", "No se pudo abrir el historial", e.getMessage(), Alert.AlertType.ERROR);
@@ -229,6 +238,7 @@ public class DashboardAdminController implements Initializable {
         if (!confirmado) return;
 
         try {
+            timelineNotificaciones.stop();
             SesionUsuario.cerrarSesion();
             sceneManager.showLoginView();
         } catch (Exception e) {
