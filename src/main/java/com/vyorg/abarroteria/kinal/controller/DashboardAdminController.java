@@ -241,6 +241,16 @@ public class DashboardAdminController implements Initializable {
     }
 
     @FXML
+    private void handleVerEstadisticas() {
+        try {
+            timelineNotificaciones.stop();
+            sceneManager.showEstadisticas();
+        } catch (Exception e) {
+            sceneManager.showAlertInfo("Error", "No se pudieron cargar las estadisticas", e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
     private void handleCerrarSesion() {
         boolean confirmado = sceneManager.showConfirmation(
                 "Cerrar sesion", "Confirmar cierre de sesion",

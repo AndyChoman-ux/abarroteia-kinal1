@@ -5,6 +5,8 @@ import main.java.com.vyorg.abarroteria.kinal.model.Venta;
 import main.java.com.vyorg.abarroteria.kinal.repository.VentaRepository;
 
 import java.util.List;
+import main.java.com.vyorg.abarroteria.kinal.model.ProductoMasVendido;
+import main.java.com.vyorg.abarroteria.kinal.model.VentaPorDia;
 
 public class HistorialVentasService {
 
@@ -32,5 +34,13 @@ public class HistorialVentasService {
 
     public void actualizarFactura(int idVenta, String rutaFactura) {
         ventaRepository.actualizarRutaFactura(idVenta, rutaFactura);
+    }
+    
+        public List<VentaPorDia> obtenerVentasPorDia(int dias) {
+        return ventaRepository.obtenerVentasPorDia(dias);
+    }
+
+    public List<ProductoMasVendido> obtenerTopProductos(int limite) {
+        return ventaRepository.obtenerTopProductos(limite);
     }
 }

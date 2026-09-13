@@ -5,29 +5,29 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1000.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardAdminController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1200.0" stylesheets="@../css/dashboard-view.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.com.vyorg.abarroteria.kinal.controller.DashboardAdminController">
    <children>
-      <ImageView fitHeight="720.0" fitWidth="1000.0" opacity="0.18">
+      <ImageView fitHeight="720.0" fitWidth="1200.0" opacity="0.18">
          <image>
             <Image url="@../img/login-background.png" />
          </image>
       </ImageView>
       <BorderPane styleClass="root-transparente">
          <top>
-            <VBox alignment="CENTER" spacing="12.0" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" spacing="8.0" BorderPane.alignment="CENTER">
                <padding>
-                  <Insets bottom="14.0" left="20.0" right="20.0" top="18.0" />
+                  <Insets bottom="8.0" left="20.0" right="20.0" top="8.0" />
                </padding>
                <children>
                   <HBox alignment="CENTER_LEFT">
@@ -37,24 +37,24 @@
                   </HBox>
                   <StackPane alignment="CENTER">
                      <children>
-                        <ImageView fitWidth="480.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitWidth="440.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../img/titulo-banner.png" />
                            </image>
                         </ImageView>
-                        <ImageView fitHeight="103.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER_LEFT">
+                        <ImageView fitHeight="88.0" fitWidth="76.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER_LEFT">
                            <image>
                               <Image url="@../img/login-logo.png" />
                            </image>
                         </ImageView>
-                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="50.0" prefWidth="50.0" StackPane.alignment="TOP_RIGHT">
+                        <StackPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" StackPane.alignment="TOP_RIGHT">
                            <StackPane.margin>
-                              <Insets right="10.0" top="10.0" />
+                              <Insets right="10.0" top="2.0" />
                            </StackPane.margin>
                            <children>
-                              <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;">
+                              <Button fx:id="btnNotificaciones" mnemonicParsing="false" onAction="#handleVerNotificaciones" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;">
                                  <graphic>
-                                    <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                    <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
                                           <Image url="@../img/bell-icon.png" />
                                        </image>
@@ -63,40 +63,48 @@
                               </Button>
                               <Label fx:id="lblBadgeNotificaciones" managed="false" style="-fx-background-color: #E53935; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 1 5 1 5;" text="0" visible="false" StackPane.alignment="TOP_RIGHT">
                                  <StackPane.margin>
-                                    <Insets right="2.0" top="2.0" />
+                                    <Insets right="2.0" top="0.0" />
                                  </StackPane.margin>
                               </Label>
                            </children>
                         </StackPane>
-                        <Button fx:id="btnHistorialVentas" mnemonicParsing="false" onAction="#handleVerHistorial" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #43A047; -fx-text-fill: white;" text="Historial de ventas " StackPane.alignment="TOP_RIGHT">
+                        <Button fx:id="btnHistorialVentas" mnemonicParsing="false" onAction="#handleVerHistorial" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: #43A047; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6;" text="Historial ventas" StackPane.alignment="TOP_RIGHT">
                            <font>
-                              <Font name="Georgia" size="14.0" />
+                              <Font name="Georgia" size="11.0" />
                            </font>
                            <StackPane.margin>
-                              <Insets right="10.0" top="65.0" />
+                              <Insets right="10.0" top="44.0" />
                            </StackPane.margin>
                         </Button>
-                        <Button fx:id="btnHistorialInventario" mnemonicParsing="false" onAction="#handleVerHistorialInventario" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #1565C0; -fx-text-fill: white;" text="Hist. inventario" StackPane.alignment="TOP_RIGHT">
+                        <Button fx:id="btnHistorialInventario" mnemonicParsing="false" onAction="#handleVerHistorialInventario" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6;" text="Hist. inventario" StackPane.alignment="TOP_RIGHT">
                            <font>
-                              <Font name="Georgia" size="12.0" />
+                              <Font name="Georgia" size="11.0" />
                            </font>
                            <StackPane.margin>
-                              <Insets right="10.0" top="95.0" />
+                              <Insets right="10.0" top="74.0" />
+                           </StackPane.margin>
+                        </Button>
+                        <Button fx:id="btnEstadisticas" mnemonicParsing="false" onAction="#handleVerEstadisticas" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: #F57C00; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6;" text="Estadísticas" StackPane.alignment="TOP_RIGHT">
+                           <font>
+                              <Font name="Georgia" size="11.0" />
+                           </font>
+                           <StackPane.margin>
+                              <Insets right="10.0" top="104.0" />
                            </StackPane.margin>
                         </Button>
                      </children>
                   </StackPane>
-
-                  <HBox alignment="CENTER_LEFT" maxWidth="440.0" styleClass="search-box">
+                  <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
                      <children>
-                        <Label styleClass="search-icon" text="🔍" />
-                        <TextField fx:id="txtBuscarProducto" promptText="Buscar producto" styleClass="search-field" HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER_LEFT" maxWidth="440.0" styleClass="search-box">
+                           <children>
+                              <Label styleClass="search-icon" text="🔍" />
+                              <TextField fx:id="txtBuscarProducto" promptText="Buscar producto" styleClass="search-field" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
                      </children>
                   </HBox>
-
-                  <!-- Elemento agregado para el contenedor de categorías -->
                   <HBox fx:id="hboxCategorias" alignment="CENTER_LEFT" spacing="8.0" />
-
                </children>
             </VBox>
          </top>
@@ -128,7 +136,7 @@
             </VBox>
          </center>
          <right>
-            <VBox prefWidth="300.0" spacing="8.0" styleClass="ticket-card" BorderPane.alignment="CENTER">
+            <VBox prefWidth="380.0" spacing="8.0" styleClass="ticket-card" BorderPane.alignment="CENTER">
                <padding>
                   <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                </padding>
