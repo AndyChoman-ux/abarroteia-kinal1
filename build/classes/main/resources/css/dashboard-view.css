@@ -232,3 +232,32 @@
     -fx-text-fill: #546E7A;
     -fx-font-size: 12px;
 }
+
+.producto-categoria-badge {
+    -fx-background-color: #E8F5E9;
+    -fx-text-fill: #2E7D32;
+    -fx-background-radius: 6;
+    -fx-font-size: 9px;
+    -fx-padding: 1 6 1 6;
+}
+
+.chip-categoria {
+    -fx-background-color: white;
+    -fx-text-fill: #546E7A;
+    -fx-background-radius: 20;
+    -fx-border-color: #CFD8DC;
+    -fx-border-radius: 20;
+    -fx-font-size: 12px;
+    -fx-padding: 5 14 5 14;
+    -fx-cursor: hand;
+}
+
+.chip-categoria:hover {
+    -fx-border-color: #43A047;
+}
+
+.chip-categoria-activo {
+    -fx-background-color: #43A047;
+    -fx-text-fill: white;
+    -fx-border-color: #43A047;
+}

@@ -61,7 +61,7 @@
                                     </ImageView>
                                  </graphic>
                               </Button>
-                              <Label fx:id="lblBadgeNotificaciones" managed="false" text="0" visible="false" StackPane.alignment="TOP_RIGHT" style="-fx-background-color: #E53935; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 1 5 1 5;">
+                              <Label fx:id="lblBadgeNotificaciones" managed="false" style="-fx-background-color: #E53935; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 1 5 1 5;" text="0" visible="false" StackPane.alignment="TOP_RIGHT">
                                  <StackPane.margin>
                                     <Insets right="2.0" top="2.0" />
                                  </StackPane.margin>
@@ -78,12 +78,17 @@
                         </Button>
                      </children>
                   </StackPane>
+
                   <HBox alignment="CENTER_LEFT" maxWidth="440.0" styleClass="search-box">
                      <children>
                         <Label styleClass="search-icon" text="🔍" />
                         <TextField fx:id="txtBuscarProducto" promptText="Buscar producto" styleClass="search-field" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
+
+                  <!-- Elemento agregado para el contenedor de categorías -->
+                  <HBox fx:id="hboxCategorias" alignment="CENTER_LEFT" spacing="8.0" />
+
                </children>
             </VBox>
          </top>
@@ -95,7 +100,7 @@
                <children>
                   <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="productos-scroll" VBox.vgrow="ALWAYS">
                      <content>
-                        <FlowPane fx:id="flowProductos" hgap="14.0" vgap="14.0" styleClass="productos-grid">
+                        <FlowPane fx:id="flowProductos" hgap="14.0" styleClass="productos-grid" vgap="14.0">
                            <padding>
                               <Insets bottom="10.0" left="4.0" right="4.0" top="4.0" />
                            </padding>

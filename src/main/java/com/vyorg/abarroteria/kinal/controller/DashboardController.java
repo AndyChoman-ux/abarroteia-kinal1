@@ -22,6 +22,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import main.java.com.vyorg.abarroteria.kinal.model.CarritoItem;
@@ -42,6 +43,8 @@ public class DashboardController implements Initializable {
 
     @FXML
     private TextField txtBuscarProducto;
+    @FXML
+    private HBox hboxCategorias;
     @FXML
     private FlowPane flowProductos;
     @FXML
@@ -69,6 +72,7 @@ public class DashboardController implements Initializable {
     private FilteredList<Producto> productosFiltrados;
     private Producto productoSeleccionado;
     private VBox tarjetaSeleccionada;
+    private String categoriaSeleccionada = "Todos";
     private final ObservableList<CarritoItem> carrito = FXCollections.observableArrayList();
     private final NotificacionService notificacionService = new NotificacionService();
     private final HistorialVentasService historialVentasService = new HistorialVentasService();
@@ -108,7 +112,32 @@ public class DashboardController implements Initializable {
     private void handleLoadDataTableView() {
         listaProductos = dashboardService.findProducto();
         productosFiltrados = new FilteredList<>(listaProductos, p -> true);
+        renderizarCategorias();
         renderizarProductos();
+    }
+
+    private void renderizarCategorias() {
+        hboxCategorias.getChildren().clear();
+        java.util.Set<String> categorias = new java.util.TreeSet<>();
+        categorias.add("Todos");
+        for (Producto productoInstancia : listaProductos) {
+            if (productoInstancia.getCategoria() != null) {
+                categorias.add(productoInstancia.getCategoria());
+            }
+        }
+        for (String categoria : categorias) {
+            Button chip = new Button(categoria);
+            chip.getStyleClass().add("chip-categoria");
+            if (categoria.equals(categoriaSeleccionada)) {
+                chip.getStyleClass().add("chip-categoria-activo");
+            }
+            chip.setOnAction(e -> {
+                categoriaSeleccionada = categoria;
+                renderizarCategorias();
+                filtrarProductos(txtBuscarProducto.getText());
+            });
+            hboxCategorias.getChildren().add(chip);
+        }
     }
 
     private void filtrarProductos(String texto) {
@@ -119,11 +148,12 @@ public class DashboardController implements Initializable {
         String filtro = texto == null ? "" : texto.trim().toLowerCase();
 
         productosFiltrados.setPredicate(producto -> {
-            if (filtro.isEmpty()) {
-                return true;
-            }
-            return producto.getNombreProducto().toLowerCase().contains(filtro)
+            boolean coincideTexto = filtro.isEmpty()
+                    || producto.getNombreProducto().toLowerCase().contains(filtro)
                     || producto.getIdProducto().toLowerCase().contains(filtro);
+            boolean coincideCategoria = "Todos".equals(categoriaSeleccionada)
+                    || (producto.getCategoria() != null && producto.getCategoria().equals(categoriaSeleccionada));
+            return coincideTexto && coincideCategoria;
         });
 
         renderizarProductos();
