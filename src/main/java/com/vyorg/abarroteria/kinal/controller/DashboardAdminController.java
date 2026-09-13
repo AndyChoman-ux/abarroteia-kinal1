@@ -231,6 +231,16 @@ public class DashboardAdminController implements Initializable {
     }
 
     @FXML
+    private void handleVerHistorialInventario() {
+        try {
+            timelineNotificaciones.stop();
+            sceneManager.showHistorialInventario();
+        } catch (Exception e) {
+            sceneManager.showAlertInfo("Error", "No se pudo abrir el historial de inventario", e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
     private void handleCerrarSesion() {
         boolean confirmado = sceneManager.showConfirmation(
                 "Cerrar sesion", "Confirmar cierre de sesion",

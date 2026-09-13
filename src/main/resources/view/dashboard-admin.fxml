@@ -76,6 +76,14 @@
                               <Insets right="10.0" top="65.0" />
                            </StackPane.margin>
                         </Button>
+                        <Button fx:id="btnHistorialInventario" mnemonicParsing="false" onAction="#handleVerHistorialInventario" prefHeight="14.0" prefWidth="153.0" style="-fx-background-color: #1565C0; -fx-text-fill: white;" text="Hist. inventario" StackPane.alignment="TOP_RIGHT">
+                           <font>
+                              <Font name="Georgia" size="12.0" />
+                           </font>
+                           <StackPane.margin>
+                              <Insets right="10.0" top="95.0" />
+                           </StackPane.margin>
+                        </Button>
                      </children>
                   </StackPane>
 
