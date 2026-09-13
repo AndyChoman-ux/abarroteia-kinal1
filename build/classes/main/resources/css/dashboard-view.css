@@ -32,6 +32,12 @@
     -fx-text-fill: #E65100;
 }
 
+.label-bienvenida {
+    -fx-text-fill: #546E7A;
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+}
+
 .search-box {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 20;
@@ -157,7 +163,6 @@
 }
 .btn-secundario:hover { -fx-background-color: #CFD8DC; }
 
-
 .boton-redondo {
     -fx-background-radius: 50%;
     -fx-border-radius: 50%;
@@ -190,6 +195,21 @@
 
 .producto-card-seleccionada {
     -fx-border-color: #43A047;
+}
+
+.producto-card-stock-bajo {
+    -fx-border-color: #E53935;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+}
+
+.etiqueta-stock-bajo {
+    -fx-background-color: #E53935;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-padding: 1 6 1 6;
 }
 
 .producto-imagen-marco {

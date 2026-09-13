@@ -49,6 +49,8 @@ public class DashboardController implements Initializable {
     @FXML
     private Label lblBadgeNotificaciones;
     @FXML
+    private Label lblBienvenida;
+    @FXML
     private ComboBox<String> cbListaPrecio;
     @FXML
     private ComboBox<String> cbNumeracion;
@@ -100,6 +102,7 @@ public class DashboardController implements Initializable {
 
         actualizarResumenCarrito();
         actualizarBadgeNotificaciones();
+        lblBienvenida.setText("Bienvenido, " + SesionUsuario.getNombreUsuario());
     }
 
     private void handleLoadDataTableView() {
