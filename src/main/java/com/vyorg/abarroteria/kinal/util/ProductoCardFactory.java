@@ -73,7 +73,7 @@ public class ProductoCardFactory {
             tarjeta.getStyleClass().add("producto-card-stock-bajo");
         }
         tarjeta.setPadding(new Insets(10.0));
-        tarjeta.setPrefWidth(230.0);
+        tarjeta.setPrefWidth(215.0);
         tarjeta.setUserData(producto);
 
         return tarjeta;

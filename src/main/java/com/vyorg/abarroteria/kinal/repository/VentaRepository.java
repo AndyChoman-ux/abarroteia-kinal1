@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import main.java.com.vyorg.abarroteria.kinal.model.VentaPorDia;
+import main.java.com.vyorg.abarroteria.kinal.model.ProductoMasVendido;
 
 public class VentaRepository {
 
@@ -137,5 +139,45 @@ public class VentaRepository {
             e.printStackTrace();
             System.err.println("Error al actualizar la ruta de la factura: " + e.getMessage());
         }
+    }
+        public List<VentaPorDia> obtenerVentasPorDia(int dias) {
+        List<VentaPorDia> lista = new ArrayList<>();
+        String sql = "SELECT DATE(fecha) as dia, SUM(total) as total FROM ventas "
+                   + "WHERE fecha >= (CURDATE() - INTERVAL ? DAY) "
+                   + "GROUP BY DATE(fecha) ORDER BY dia";
+
+        try (Connection conn = DataBaseConnection.getDataBaseConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, dias);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new VentaPorDia(rs.getDate("dia").toString(), rs.getDouble("total")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al consultar ventas por dia: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public List<ProductoMasVendido> obtenerTopProductos(int limite) {
+        List<ProductoMasVendido> lista = new ArrayList<>();
+        String sql = "SELECT descripcion, SUM(cantidad) as total_cantidad FROM detalle_venta "
+                   + "GROUP BY descripcion ORDER BY total_cantidad DESC LIMIT ?";
+
+        try (Connection conn = DataBaseConnection.getDataBaseConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limite);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new ProductoMasVendido(rs.getString("descripcion"), rs.getInt("total_cantidad")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al consultar productos mas vendidos: " + e.getMessage());
+        }
+        return lista;
     }
 }

@@ -43,6 +43,7 @@ import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 import javafx.scene.layout.StackPane;
 import main.java.com.vyorg.abarroteria.kinal.controller.HistorialInventarioController;
+import main.java.com.vyorg.abarroteria.kinal.controller.EstadisticasController;
 
 public class SceneManager {
 
@@ -430,5 +431,23 @@ public class SceneManager {
         
         Stage stageDialogo = (Stage) panel.getScene().getWindow();          
         stageDialogo.getIcons().add(new Image(getClass().getResourceAsStream("/main/resources/img/login-logo.png")));      
+    }
+        public void showEstadisticas() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/view/estadisticas-view.fxml"));
+
+            Parent root = loader.load();
+
+            EstadisticasController controller = loader.getController();
+            if (controller != null) {
+                controller.setSceneManager(this);
+            }
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("Estadísticas - Abarrotería Kinal");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
