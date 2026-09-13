@@ -15,7 +15,7 @@ import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 public class ProductoCardFactory {
 
     private static final String IMAGEN_POR_DEFECTO = "/main/resources/img/login-logo.png";
-    private static final int UMBRAL_STOCK_BAJO = 5;
+    private static final int UMBRAL_STOCK_BAJO = 10;
 
     private ProductoCardFactory() {
     }
