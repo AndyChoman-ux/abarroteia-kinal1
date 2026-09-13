@@ -22,7 +22,8 @@ public class ProductoRepository {
                         rs.getString("nombre_producto"),
                         rs.getInt("stock"),
                         rs.getBigDecimal("precio"),
-                        rs.getString("ruta_imagen")
+                        rs.getString("ruta_imagen"),
+                        rs.getString("categoria")
                 ));
             }
             return lista;
@@ -58,13 +59,14 @@ public class ProductoRepository {
     }
 
     public boolean agregarProducto(Producto producto) {
-        String sql = "insert into productos (id_producto, nombre_producto, stock, precio, ruta_imagen) values (?, ?, ?, ?, ?)";
+        String sql = "insert into productos (id_producto, nombre_producto, stock, precio, ruta_imagen, categoria) values (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = DataBaseConnection.getDataBaseConnection().prepareStatement(sql)) {
             pstm.setString(1, producto.getIdProducto());
             pstm.setString(2, producto.getNombreProducto());
             pstm.setInt(3, producto.getStock());
             pstm.setBigDecimal(4, producto.getPrecio());
             pstm.setString(5, producto.getRutaImagen());
+            pstm.setString(6, producto.getCategoria());
             int filasAfectadas = pstm.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLIntegrityConstraintViolationException e) {
@@ -75,13 +77,14 @@ public class ProductoRepository {
     }
 
     public boolean actualizarProducto(Producto producto) {
-        String sql = "update productos set nombre_producto = ?, stock = ?, precio = ?, ruta_imagen = ? where id_producto = ?";
+        String sql = "update productos set nombre_producto = ?, stock = ?, precio = ?, ruta_imagen = ?, categoria = ? where id_producto = ?";
         try (PreparedStatement pstm = DataBaseConnection.getDataBaseConnection().prepareStatement(sql)) {
             pstm.setString(1, producto.getNombreProducto());
             pstm.setInt(2, producto.getStock());
             pstm.setBigDecimal(3, producto.getPrecio());
             pstm.setString(4, producto.getRutaImagen());
-            pstm.setString(5, producto.getIdProducto());
+            pstm.setString(5, producto.getCategoria());
+            pstm.setString(6, producto.getIdProducto());
             int filasAfectadas = pstm.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLException e) {

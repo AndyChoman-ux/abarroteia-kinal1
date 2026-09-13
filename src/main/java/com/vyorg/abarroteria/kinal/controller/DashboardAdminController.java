@@ -35,6 +35,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -61,6 +62,8 @@ public class DashboardAdminController implements Initializable {
     @FXML
     private TextField txtBuscarProducto;
     @FXML
+    private HBox hboxCategorias;
+    @FXML
     private FlowPane flowProductos;
     @FXML
     private Label lblBadgeNotificaciones;
@@ -85,6 +88,7 @@ public class DashboardAdminController implements Initializable {
     private FilteredList<Producto> productosFiltrados;
     private Producto productoSeleccionado;
     private VBox tarjetaSeleccionada;
+    private String categoriaSeleccionada = "Todos";
     private final ObservableList<CarritoItem> carrito = FXCollections.observableArrayList();
 
     public DashboardAdminController(AuthService authService, DashboardService dashboardService, SceneManager sceneManager) {
@@ -123,21 +127,50 @@ public class DashboardAdminController implements Initializable {
     private void handleLoadDataTableView() {
         listaProductos = dashboardService.findProducto();
         productosFiltrados = new FilteredList<>(listaProductos, p -> true);
+        renderizarCategorias();
         renderizarProductos();
+    }
+
+    private void renderizarCategorias() {
+        hboxCategorias.getChildren().clear();
+        java.util.Set<String> categorias = new java.util.TreeSet<>();
+        categorias.add("Todos");
+        for (Producto productoInstancia : listaProductos) {
+            if (productoInstancia.getCategoria() != null) {
+                categorias.add(productoInstancia.getCategoria());
+            }
+        }
+        for (String categoria : categorias) {
+            Button chip = new Button(categoria);
+            chip.getStyleClass().add("chip-categoria");
+            if (categoria.equals(categoriaSeleccionada)) {
+                chip.getStyleClass().add("chip-categoria-activo");
+            }
+            chip.setOnAction(e -> {
+                categoriaSeleccionada = categoria;
+                renderizarCategorias();
+                filtrarProductos(txtBuscarProducto.getText());
+            });
+            hboxCategorias.getChildren().add(chip);
+        }
     }
 
     private void filtrarProductos(String texto) {
         if (productosFiltrados == null) {
             return;
         }
+
         String filtro = texto == null ? "" : texto.trim().toLowerCase();
+
         productosFiltrados.setPredicate(producto -> {
-            if (filtro.isEmpty()) {
-                return true;
-            }
-            return producto.getNombreProducto().toLowerCase().contains(filtro)
+            boolean coincideTexto = filtro.isEmpty()
+                    || producto.getNombreProducto().toLowerCase().contains(filtro)
                     || producto.getIdProducto().toLowerCase().contains(filtro);
+            boolean coincideCategoria = "Todos".equals(categoriaSeleccionada)
+                    || (producto.getCategoria() != null && producto.getCategoria().equals(categoriaSeleccionada));
+            return coincideTexto && coincideCategoria;
         });
+
         renderizarProductos();
     }
 
@@ -234,7 +267,7 @@ public class DashboardAdminController implements Initializable {
         resultado.ifPresent(producto -> {
             try {
                 dashboardService.agregarProducto(producto.getIdProducto(), producto.getNombreProducto(),
-                        producto.getStock(), producto.getPrecio(), producto.getRutaImagen());
+                        producto.getStock(), producto.getPrecio(), producto.getRutaImagen(), producto.getCategoria());
                 handleLoadDataTableView();
                 filtrarProductos(txtBuscarProducto.getText());
                 sceneManager.showAlertInfo("Producto agregado", "Listo",
@@ -258,7 +291,7 @@ public class DashboardAdminController implements Initializable {
         resultado.ifPresent(producto -> {
             try {
                 dashboardService.actualizarProducto(producto.getIdProducto(), producto.getNombreProducto(),
-                        producto.getStock(), producto.getPrecio(), producto.getRutaImagen());
+                        producto.getStock(), producto.getPrecio(), producto.getRutaImagen(), producto.getCategoria());
                 handleLoadDataTableView();
                 filtrarProductos(txtBuscarProducto.getText());
                 sceneManager.showAlertInfo("Producto actualizado", "Listo",
@@ -323,6 +356,18 @@ public class DashboardAdminController implements Initializable {
         TextField txtPrecio = new TextField();
         txtPrecio.setPromptText("Precio");
 
+        ComboBox<String> cbCategoriaDialogo = new ComboBox<>();
+        cbCategoriaDialogo.setEditable(true);
+        cbCategoriaDialogo.setPromptText("Categoria");
+        java.util.Set<String> categoriasExistentes = new java.util.TreeSet<>();
+        for (Producto p : listaProductos) {
+            if (p.getCategoria() != null) {
+                categoriasExistentes.add(p.getCategoria());
+            }
+        }
+        cbCategoriaDialogo.setItems(FXCollections.observableArrayList(categoriasExistentes));
+        cbCategoriaDialogo.setValue(productoExistente == null ? "General" : productoExistente.getCategoria());
+
         ImageView previewImagen = new ImageView();
         previewImagen.setFitWidth(80.0);
         previewImagen.setFitHeight(80.0);
@@ -366,6 +411,8 @@ public class DashboardAdminController implements Initializable {
         grid.add(txtPrecio, 1, 3);
         grid.add(new Label("Imagen:"), 0, 4);
         grid.add(columnaImagen, 1, 4);
+        grid.add(new Label("Categoria:"), 0, 5);
+        grid.add(cbCategoriaDialogo, 1, 5);
 
         dialog.getDialogPane().setContent(grid);
         sceneManager.estilizarDialogo(dialog);
@@ -380,7 +427,9 @@ public class DashboardAdminController implements Initializable {
                 int stock = Integer.parseInt(txtStock.getText().trim());
                 BigDecimal precio = new BigDecimal(txtPrecio.getText().trim());
                 String rutaFinal = guardarImagenSiEsNueva(id, rutaImagenSeleccionada[0]);
-                return new Producto(id, nombre, stock, precio, rutaFinal);
+                String categoria = cbCategoriaDialogo.getEditor().getText() == null || cbCategoriaDialogo.getEditor().getText().isBlank()
+                        ? "General" : cbCategoriaDialogo.getEditor().getText().trim();
+                return new Producto(id, nombre, stock, precio, rutaFinal, categoria);
             } catch (NumberFormatException e) {
                 sceneManager.showAlertInfo("Datos invalidos", "Revise los datos",
                         "Stock y precio deben ser numeros validos", Alert.AlertType.ERROR);

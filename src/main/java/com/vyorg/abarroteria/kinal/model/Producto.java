@@ -8,17 +8,23 @@ public class Producto {
     private int stock;
     private BigDecimal precio;
     private String rutaImagen;
+    private String categoria;
 
     public Producto(String idProducto, String nombreProducto, int stock, BigDecimal precio) {
-        this(idProducto, nombreProducto, stock, precio, null);
+        this(idProducto, nombreProducto, stock, precio, null, null);
     }
 
     public Producto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen) {
+        this(idProducto, nombreProducto, stock, precio, rutaImagen, null);
+    }
+
+    public Producto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen, String categoria) {
         this.idProducto = idProducto;
         this.nombreProducto = nombreProducto;
         this.stock = stock;
         this.precio = precio;
         this.rutaImagen = rutaImagen;
+        this.categoria = (categoria == null || categoria.isBlank()) ? "General" : categoria;
     }
 
     public String getIdProducto() {
@@ -59,5 +65,13 @@ public class Producto {
 
     public void setRutaImagen(String rutaImagen) {
         this.rutaImagen = rutaImagen;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = (categoria == null || categoria.isBlank()) ? "General" : categoria;
     }
 }

@@ -15,7 +15,7 @@ import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 public class ProductoCardFactory {
 
     private static final String IMAGEN_POR_DEFECTO = "/main/resources/img/login-logo.png";
-    private static final int UMBRAL_STOCK_BAJO = 5;
+    private static final int UMBRAL_STOCK_BAJO = 10;
 
     private ProductoCardFactory() {
     }
@@ -36,10 +36,16 @@ public class ProductoCardFactory {
         Label lblId = new Label(producto.getIdProducto());
         lblId.getStyleClass().add("producto-id");
 
+        Label lblCategoria = new Label(producto.getCategoria());
+        lblCategoria.getStyleClass().add("producto-categoria-badge");
+
+        HBox filaSuperior = new HBox(6.0, lblId, lblCategoria);
+        filaSuperior.setAlignment(Pos.CENTER_LEFT);
+
         Label lblNombre = new Label(producto.getNombreProducto());
         lblNombre.getStyleClass().add("producto-nombre");
         lblNombre.setWrapText(true);
-        lblNombre.setMaxWidth(130.0);
+        lblNombre.setMaxWidth(150.0);
 
         Label lblPrecio = new Label("Precio  Q" + producto.getPrecio().setScale(2, RoundingMode.HALF_UP));
         lblPrecio.getStyleClass().add("producto-detalle");
@@ -50,7 +56,7 @@ public class ProductoCardFactory {
         Label lblStock = new Label("Stock  " + producto.getStock());
         lblStock.getStyleClass().add("producto-detalle");
 
-        VBox textos = new VBox(2.0, lblId, lblNombre, lblPrecio, lblStock);
+        VBox textos = new VBox(2.0, filaSuperior, lblNombre, lblPrecio, lblStock);
 
         if (stockBajo || sinStock) {
             Label etiqueta = new Label(sinStock ? "Agotado" : "¡Últimas unidades!");

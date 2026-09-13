@@ -69,7 +69,7 @@ public class DashboardService {
             }
         }
     }
-        public void agregarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen) {
+            public void agregarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen, String categoria) {
         if (idProducto == null || idProducto.isBlank()) {
             throw new RuntimeException("Debe ingresar un ID de producto");
         }
@@ -83,13 +83,13 @@ public class DashboardService {
             throw new RuntimeException("El precio no puede ser negativo");
         }
 
-        boolean agregado = productoRepository.agregarProducto(new Producto(idProducto, nombreProducto, stock, precio, rutaImagen));
+        boolean agregado = productoRepository.agregarProducto(new Producto(idProducto, nombreProducto, stock, precio, rutaImagen, categoria));
         if (!agregado) {
             throw new RuntimeException("No se pudo agregar el producto");
         }
     }
 
-    public void actualizarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen) {
+    public void actualizarProducto(String idProducto, String nombreProducto, int stock, BigDecimal precio, String rutaImagen, String categoria) {
         if (idProducto == null || idProducto.isBlank()) {
             throw new RuntimeException("Debe seleccionar un producto valido");
         }
@@ -103,9 +103,9 @@ public class DashboardService {
             throw new RuntimeException("El precio no puede ser negativo");
         }
 
-        boolean actualizado = productoRepository.actualizarProducto(new Producto(idProducto, nombreProducto, stock, precio, rutaImagen));
+        boolean actualizado = productoRepository.actualizarProducto(new Producto(idProducto, nombreProducto, stock, precio, rutaImagen, categoria));
         if (!actualizado) {
             throw new RuntimeException("No se pudo actualizar el producto");
         }
     }
-}
+  } 
