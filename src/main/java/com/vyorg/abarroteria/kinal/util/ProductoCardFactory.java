@@ -12,13 +12,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
 
-/**
- * Construye la tarjeta visual (imagen + datos) que se usa tanto
- * en el dashboard normal como en el dashboard admin.
- */
 public class ProductoCardFactory {
 
     private static final String IMAGEN_POR_DEFECTO = "/main/resources/img/login-logo.png";
+    private static final int UMBRAL_STOCK_BAJO = 5;
 
     private ProductoCardFactory() {
     }
@@ -47,16 +44,28 @@ public class ProductoCardFactory {
         Label lblPrecio = new Label("Precio  Q" + producto.getPrecio().setScale(2, RoundingMode.HALF_UP));
         lblPrecio.getStyleClass().add("producto-detalle");
 
+        boolean stockBajo = producto.getStock() > 0 && producto.getStock() <= UMBRAL_STOCK_BAJO;
+        boolean sinStock = producto.getStock() <= 0;
+
         Label lblStock = new Label("Stock  " + producto.getStock());
         lblStock.getStyleClass().add("producto-detalle");
 
         VBox textos = new VBox(2.0, lblId, lblNombre, lblPrecio, lblStock);
+
+        if (stockBajo || sinStock) {
+            Label etiqueta = new Label(sinStock ? "Agotado" : "¡Últimas unidades!");
+            etiqueta.getStyleClass().add("etiqueta-stock-bajo");
+            textos.getChildren().add(etiqueta);
+        }
 
         HBox contenido = new HBox(10.0, marcoImagen, textos);
         contenido.setAlignment(Pos.CENTER_LEFT);
 
         VBox tarjeta = new VBox(contenido);
         tarjeta.getStyleClass().add("producto-card");
+        if (stockBajo || sinStock) {
+            tarjeta.getStyleClass().add("producto-card-stock-bajo");
+        }
         tarjeta.setPadding(new Insets(10.0));
         tarjeta.setPrefWidth(230.0);
         tarjeta.setUserData(producto);
