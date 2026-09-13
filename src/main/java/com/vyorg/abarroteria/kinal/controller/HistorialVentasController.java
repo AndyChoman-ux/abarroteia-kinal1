@@ -25,7 +25,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-
+import main.java.com.vyorg.abarroteria.kinal.util.ReporteVentasGenerator;
 import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
@@ -80,6 +80,36 @@ public class HistorialVentasController implements Initializable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+    
+        @FXML
+    private void handleExportarPdf() {
+        try {
+            File archivo = ReporteVentasGenerator.generarPdf(tblVentas.getItems());
+            abrirArchivo(archivo);
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "No se pudo generar el reporte PDF: " + e.getMessage()).showAndWait();
+        }
+    }
+
+    @FXML
+    private void handleExportarExcel() {
+        try {
+            File archivo = ReporteVentasGenerator.generarCsv(tblVentas.getItems());
+            abrirArchivo(archivo);
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "No se pudo generar el reporte Excel: " + e.getMessage()).showAndWait();
+        }
+    }
+
+    private void abrirArchivo(File archivo) {
+        try {
+            if (archivo.exists() && Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(archivo);
+            }
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.WARNING, "El archivo se genero pero no se pudo abrir automaticamente: " + archivo.getAbsolutePath()).showAndWait();
         }
     }
 

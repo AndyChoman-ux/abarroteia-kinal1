@@ -14,7 +14,7 @@
    <children>
       <VBox spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
          <children>
-            <!-- ENCABEZADO CON BOTÓN Y TÍTULO -->
+            <!-- ENCABEZADO CON BOTONES Y TÍTULO -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                <children>
                   <Button fx:id="btnRegresar" onAction="#handleRegresarAction" style="-fx-background-color: #757575; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 5px; -fx-padding: 8 15;" text="← Regresar" />
@@ -23,6 +23,12 @@
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button fx:id="btnExportarPdf" onAction="#handleExportarPdf" style="-fx-background-color: #E65100; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 5px; -fx-padding: 8 15;" text="Exportar PDF" />
+                        <Button fx:id="btnExportarExcel" onAction="#handleExportarExcel" style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 5px; -fx-padding: 8 15;" text="Exportar Excel" />
+                     </children>
+                  </HBox>
                </children>
             </HBox>
 
