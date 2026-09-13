@@ -3,11 +3,15 @@ package main.java.com.vyorg.abarroteria.kinal.controller;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -33,6 +37,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import main.java.com.vyorg.abarroteria.kinal.model.CarritoItem;
 import main.java.com.vyorg.abarroteria.kinal.model.DetalleVenta;
 import main.java.com.vyorg.abarroteria.kinal.model.Producto;
@@ -44,11 +49,6 @@ import main.java.com.vyorg.abarroteria.kinal.util.FacturaPdfGenerator;
 import main.java.com.vyorg.abarroteria.kinal.util.ProductoCardFactory;
 import main.java.com.vyorg.abarroteria.kinal.util.SceneManager;
 import main.java.com.vyorg.abarroteria.kinal.util.SesionUsuario;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DashboardAdminController implements Initializable {
 
@@ -64,6 +64,8 @@ public class DashboardAdminController implements Initializable {
     private FlowPane flowProductos;
     @FXML
     private Label lblBadgeNotificaciones;
+    @FXML
+    private Label lblBienvenida;
     @FXML
     private ComboBox<String> cbListaPrecio;
     @FXML
@@ -115,6 +117,7 @@ public class DashboardAdminController implements Initializable {
 
         actualizarResumenCarrito();
         actualizarBadgeNotificaciones();
+        lblBienvenida.setText("Bienvenido, " + SesionUsuario.getNombreUsuario());
     }
 
     private void handleLoadDataTableView() {

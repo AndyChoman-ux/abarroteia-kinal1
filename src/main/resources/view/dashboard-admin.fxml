@@ -32,6 +32,11 @@
                <children>
                   <StackPane alignment="CENTER">
                      <children>
+                        <Label fx:id="lblBienvenida" styleClass="label-bienvenida" text="Bienvenido" StackPane.alignment="TOP_LEFT">
+                           <StackPane.margin>
+                              <Insets left="10.0" top="14.0" />
+                           </StackPane.margin>
+                        </Label>
                         <ImageView fitWidth="480.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../img/titulo-banner.png" />
