@@ -332,7 +332,7 @@ public class DashboardAdminController implements Initializable {
         }
     }
 
-        private Optional<Producto> mostrarDialogoProducto(String titulo, Producto productoExistente) {
+    private Optional<Producto> mostrarDialogoProducto(String titulo, Producto productoExistente) {
         Dialog<Producto> dialog = new Dialog<>();
         dialog.setTitle(titulo);
         dialog.setHeaderText(productoExistente == null
@@ -418,6 +418,12 @@ public class DashboardAdminController implements Initializable {
         sceneManager.estilizarDialogo(dialog);
 
         Button botonGuardarNodo = (Button) dialog.getDialogPane().lookupButton(btnGuardar);
+        botonGuardarNodo.setDefaultButton(true);
+
+        Button botonCancelarNodo = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        if (botonCancelarNodo != null) {
+            botonCancelarNodo.setCancelButton(true);
+        }
 
         Runnable validar = () -> {
             boolean idValido = productoExistente != null || (txtId.getText() != null && !txtId.getText().trim().isEmpty());

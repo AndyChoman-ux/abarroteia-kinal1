@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import main.java.com.vyorg.abarroteria.kinal.dto.request.LoginDTORequest;
 import main.java.com.vyorg.abarroteria.kinal.dto.response.LoginDTOResponse;
 import main.java.com.vyorg.abarroteria.kinal.service.AuthService;
@@ -35,7 +36,23 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        btnIniciar.setDefaultButton(true);
 
+        txtFieldEmail.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                txtFieldPassword.requestFocus();
+            }
+        });
+
+        txtFieldPassword.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                try {
+                    handleLogin();
+                } catch (Exception e) {
+                    sceneManager.showAlertInfo("Error", "No se pudo iniciar sesion", e.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
     }
 
     public void handleLogin() throws Exception{
@@ -43,7 +60,7 @@ public class LoginController implements Initializable {
         sceneManager.showAlertInfo("Hay campos sin llenar", "No puedes dejar espacios en blanco","Intente de nuevo", Alert.AlertType.INFORMATION);
     }else{
         try{
-                        LoginDTOResponse response = authService.login(new LoginDTORequest(txtFieldEmail.getText(),txtFieldPassword.getText()));
+            LoginDTOResponse response = authService.login(new LoginDTORequest(txtFieldEmail.getText(),txtFieldPassword.getText()));
             boolean esAdmin = response.getIdRol() == 1;
             SesionUsuario.iniciarSesion(response.getNombre(), esAdmin);
             sceneManager.showAlertInfo("Bienvenido: " + response.getNombre(), "Es bueno verte:", "Inicio de sesion correcto", Alert.AlertType.INFORMATION);
