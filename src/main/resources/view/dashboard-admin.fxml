@@ -5,13 +5,13 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -30,13 +30,13 @@
                   <Insets bottom="14.0" left="20.0" right="20.0" top="18.0" />
                </padding>
                <children>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label fx:id="lblBienvenida" styleClass="label-bienvenida" text="Bienvenido" />
+                     </children>
+                  </HBox>
                   <StackPane alignment="CENTER">
                      <children>
-                        <Label fx:id="lblBienvenida" styleClass="label-bienvenida" text="Bienvenido" StackPane.alignment="TOP_LEFT">
-                           <StackPane.margin>
-                              <Insets left="10.0" top="14.0" />
-                           </StackPane.margin>
-                        </Label>
                         <ImageView fitWidth="480.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../img/titulo-banner.png" />
