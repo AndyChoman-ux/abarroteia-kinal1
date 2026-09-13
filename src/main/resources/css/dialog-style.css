@@ -61,3 +61,9 @@
     -fx-background-color: #C0522A;
     -fx-text-fill: white;
 }
+
+.campo-invalido {
+    -fx-border-color: #E53935;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 4;
+}

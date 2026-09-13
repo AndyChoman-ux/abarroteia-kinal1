@@ -332,7 +332,7 @@ public class DashboardAdminController implements Initializable {
         }
     }
 
-    private Optional<Producto> mostrarDialogoProducto(String titulo, Producto productoExistente) {
+        private Optional<Producto> mostrarDialogoProducto(String titulo, Producto productoExistente) {
         Dialog<Producto> dialog = new Dialog<>();
         dialog.setTitle(titulo);
         dialog.setHeaderText(productoExistente == null
@@ -361,12 +361,9 @@ public class DashboardAdminController implements Initializable {
         cbCategoriaDialogo.setPromptText("Categoria");
         java.util.Set<String> categoriasExistentes = new java.util.TreeSet<>();
         for (Producto p : listaProductos) {
-            if (p.getCategoria() != null) {
-                categoriasExistentes.add(p.getCategoria());
-            }
+            categoriasExistentes.add(p.getCategoria());
         }
         cbCategoriaDialogo.setItems(FXCollections.observableArrayList(categoriasExistentes));
-        cbCategoriaDialogo.setValue(productoExistente == null ? "General" : productoExistente.getCategoria());
 
         ImageView previewImagen = new ImageView();
         previewImagen.setFitWidth(80.0);
@@ -382,7 +379,10 @@ public class DashboardAdminController implements Initializable {
             txtNombre.setText(productoExistente.getNombreProducto());
             txtStock.setText(String.valueOf(productoExistente.getStock()));
             txtPrecio.setText(productoExistente.getPrecio().toPlainString());
+            cbCategoriaDialogo.setValue(productoExistente.getCategoria());
             rutaImagenSeleccionada[0] = productoExistente.getRutaImagen();
+        } else {
+            cbCategoriaDialogo.setValue("General");
         }
         previewImagen.setImage(ProductoCardFactory.cargarImagen(rutaImagenSeleccionada[0]));
 
@@ -417,6 +417,41 @@ public class DashboardAdminController implements Initializable {
         dialog.getDialogPane().setContent(grid);
         sceneManager.estilizarDialogo(dialog);
 
+        Button botonGuardarNodo = (Button) dialog.getDialogPane().lookupButton(btnGuardar);
+
+        Runnable validar = () -> {
+            boolean idValido = productoExistente != null || (txtId.getText() != null && !txtId.getText().trim().isEmpty());
+            boolean nombreValido = txtNombre.getText() != null && !txtNombre.getText().trim().isEmpty();
+
+            boolean stockValido;
+            try {
+                stockValido = Integer.parseInt(txtStock.getText().trim()) >= 0;
+            } catch (Exception e) {
+                stockValido = false;
+            }
+
+            boolean precioValido;
+            try {
+                precioValido = new BigDecimal(txtPrecio.getText().trim()).compareTo(BigDecimal.ZERO) >= 0;
+            } catch (Exception e) {
+                precioValido = false;
+            }
+
+            marcarValidez(txtId, idValido);
+            marcarValidez(txtNombre, nombreValido);
+            marcarValidez(txtStock, stockValido);
+            marcarValidez(txtPrecio, precioValido);
+
+            botonGuardarNodo.setDisable(!(idValido && nombreValido && stockValido && precioValido));
+        };
+
+        txtId.textProperty().addListener((obs, oldVal, newVal) -> validar.run());
+        txtNombre.textProperty().addListener((obs, oldVal, newVal) -> validar.run());
+        txtStock.textProperty().addListener((obs, oldVal, newVal) -> validar.run());
+        txtPrecio.textProperty().addListener((obs, oldVal, newVal) -> validar.run());
+
+        validar.run();
+
         dialog.setResultConverter(boton -> {
             if (boton != btnGuardar) {
                 return null;
@@ -438,6 +473,14 @@ public class DashboardAdminController implements Initializable {
         });
 
         return dialog.showAndWait();
+    }
+
+    private void marcarValidez(TextField campo, boolean valido) {
+        if (valido) {
+            campo.getStyleClass().remove("campo-invalido");
+        } else if (!campo.getStyleClass().contains("campo-invalido")) {
+            campo.getStyleClass().add("campo-invalido");
+        }
     }
 
     private String guardarImagenSiEsNueva(String idProducto, String rutaSeleccionada) {
